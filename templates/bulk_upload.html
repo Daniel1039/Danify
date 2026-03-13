@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Upload Questions for {{ quiz.title }}</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Upload</button>
+</form>
+{% endblock %}
+
+
+
+
+{% comment %} {% extends "base.html" %}
+
+{% block content %}
+<h2>Upload CSV File (Bulk Questions)</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form }}
+    <br><br>
+    <button type="submit" class="default">Upload</button>
+</form>
+
+<p><strong>CSV HEADERS MUST BE:</strong></p>
+<pre>
+quiz_id,question_text,option_a,option_b,option_c,option_d,correct_option,marks
+</pre>
+
+{% endblock %} {% endcomment %}

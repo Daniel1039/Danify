@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>DANIFY</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+   <link rel="stylesheet" href="{% static 'css/register.css' %}">
+</head>
+<body>
+
+<div class="reg-card">
+
+  <!-- LEFT PANEL -->
+  <div class="panel-left">
+    <div class="brand">
+      <div class="brand-badge">
+        <span></span>
+        <p>Student Portal</p>
+      </div>
+
+      <h1>Start your <em>academic</em> journey today.</h1>
+      <p class="sub">Create your account in under two minutes and gain access to your full student dashboard.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            <strong>Set Up Credentials</strong>
+            <span>Choose a secure username and password</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            <strong>Select Your Class</strong>
+            <span>Pick your class and department</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">
+            <strong>Access Dashboard</strong>
+            <span>Log in and view your profile</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-left-footer">
+      © 2025 Academic Portal · All rights reserved
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="panel-right">
+
+    <div class="form-header">
+      <h2>Create Account</h2>
+      <p>All fields are required to complete registration.</p>
+    </div>
+
+    <form method="POST" novalidate>
+      {% csrf_token %}
+
+      <div class="section-label">Account Credentials</div>
+
+      <div class="field-row single">
+        <div class="field-group">
+          <label>Username</label>
+          {{ user_form.username }}
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label>Password</label>
+          {{ user_form.password }}
+        </div>
+        <div class="field-group">
+          <label>Confirm Password</label>
+          {{ user_form.confirm_password }}
+        </div>
+      </div>
+
+      <div class="section-label">Academic Information</div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label>Class</label>
+          {{ profile_form.school_class }}
+        </div>
+        <div class="field-group">
+          <label>Department</label>
+          {{ profile_form.arm }}
+        </div>
+      </div>
+
+      <button type="submit" class="btn-register">
+        Create My Account
+      </button>
+
+    </form>
+
+    <p class="login-prompt">
+      Already have an account? <a href="{% url 'login' %}">Sign in here</a>
+    </p>
+
+  </div>
+
+</div>
+
+</body>
+</html>

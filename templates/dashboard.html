@@ -1,0 +1,404 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAPortal — Student Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+</head>
+<body>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="shell">
+
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+      <div class="logo-icon">📚</div>
+      <div class="logo-text">DA<span>Portal</span></div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-label">Main</div>
+
+      <button class="nav-item active" onclick="showPage('dashboard', this)">
+        <div class="nav-icon">🏠</div>
+        Dashboard
+      </button>
+
+      <button class="nav-item" onclick="showPage('exams', this)">
+        <div class="nav-icon">📝</div>
+        Exams
+      </button>
+
+      <button class="nav-item" onclick="showPage('results', this)">
+        <div class="nav-icon">📊</div>
+        Results
+      </button>
+
+      <div class="nav-label">Account</div>
+
+      <button class="nav-item" onclick="showPage('payment', this)">
+        <div class="nav-icon">💳</div>
+        Payment
+      </button>
+
+      <button class="nav-item" onclick="showPage('profile', this)">
+        <div class="nav-icon">👤</div>
+        My Profile
+      </button>
+
+      <div class="nav-label">Support</div>
+
+      <button class="nav-item">
+        <div class="nav-icon">❓</div>
+        Help & FAQ
+      </button>
+
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar-lg">{{ user.username|slice:":1"|upper }}</div>
+      <div class="user-info-sm">
+        <div class="user-name-sm">{{ user.username }}</div>
+        <div class="user-role-sm">Student</div>
+      </div>
+      <a href="{% url 'logout' %}" class="logout-btn" title="Logout">⎋</a>
+    </div>
+
+  </aside>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <div class="main">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-name">{{ user.username }}</span>
+        <div class="topbar-avatar">{{ user.username|slice:":1"|upper }}</div>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+      <!-- ══════════════════════════════
+           PAGE: DASHBOARD
+      ══════════════════════════════ -->
+      <div class="page active" id="page-dashboard">
+
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+          <div>
+            <div class="welcome-title">Welcome back, {{ user.username }}! 👋</div>
+            <p class="welcome-sub">You have exams available. Keep up the great work!</p>
+          </div>
+          <div class="welcome-emoji">🎓</div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon blue">📝</div>
+            <div>
+              <div class="stat-val">{{ quizzes|length }}</div>
+              <div class="stat-lbl">Subjects</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">✅</div>
+            <div>
+              <div class="stat-val">{{ attempts|length }}</div>
+              <div class="stat-lbl">Attempts</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon amber">⏳</div>
+            <div>
+              <div class="stat-val">{{ days_left }}</div>
+              <div class="stat-lbl">Days Left</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon indigo">🏆</div>
+            <div>
+              <div class="stat-val">–</div>
+              <div class="stat-lbl">Best Score</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subscription Status -->
+        <div class="status-card {% if days_left <= 2 %}s-danger{% elif days_left <= 5 %}s-warn{% else %}s-active{% endif %}">
+          <div class="s-info">
+            <div class="s-ico">{% if days_left <= 2 %}⚠️{% elif days_left <= 5 %}🕐{% else %}✅{% endif %}</div>
+            <div>
+              <div class="s-label">
+                {% if days_left <= 2 %}Subscription Expiring Urgently
+                {% elif days_left <= 5 %}Subscription Expiring Soon
+                {% else %}Subscription Active{% endif %}
+              </div>
+              <div class="s-meta">
+                <span>📅 Expires: <strong>{{ subscription.end_date|date:"F j, Y" }}</strong></span>
+                <span>⏳ <strong>{{ days_left }} days</strong> remaining</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div class="s-badge">{% if days_left <= 2 %}🚨 Renew Now{% elif days_left <= 5 %}⚠ Renew Soon{% else %}✔ Active{% endif %}</div>
+            {% comment %} <button class="btn-outline" onclick="showPage('payment', document.querySelector('[onclick*=payment]'))"> {% endcomment %}
+              {% comment %} 💳 {% if days_left <= 5 %}Renew{% else %}Pay Next Month{% endif %} {% endcomment %}
+            {% comment %} </button> {% endcomment %}
+          </div>
+        </div>
+
+
+      </div><!-- /dashboard -->
+
+      <!-- ══════════════════════════════
+           PAGE: EXAMS
+      ══════════════════════════════ -->
+      <div class="page" id="page-exams">
+
+        <div class="card-box">
+          <div class="card-header-row">
+            <h3 class="card-title">📝 Select Your Subjects</h3>
+            <button type="button" class="btn-outline" data-bs-toggle="modal" data-bs-target="#resultModal">
+              📊 View Results
+            </button>
+          </div>
+
+          <form method="POST" action="{% url 'start_exam' %}">
+            {% csrf_token %}
+            <div class="subject-grid">
+              {% for quiz in quizzes %}
+              <div class="subject-item">
+                <input type="checkbox" name="subjects" value="{{ quiz.id }}" id="quiz_{{ quiz.id }}">
+                <label class="subject-label" for="quiz_{{ quiz.id }}">
+                  <span class="chk">✓</span>
+                  {{ quiz.title }}
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+            <button type="submit" class="btn-primary">🚀 Start Exam</button>
+          </form>
+        </div>
+
+      </div><!-- /exams -->
+
+      <!-- ══════════════════════════════
+           PAGE: RESULTS
+      ══════════════════════════════ -->
+      <div class="page" id="page-results">
+
+        <div class="card-box">
+          <div class="card-header-row">
+            <h3 class="card-title">📊 All Examination Results</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="results-table">
+              <thead><tr><th>#</th><th>Quiz</th><th>Score</th><th>Total</th><th>Date & Time</th></tr></thead>
+              <tbody>
+                {% for a in attempts %}
+                <tr>
+                  <td style="color:var(--muted);">{{ forloop.counter }}</td>
+                  <td><strong>{{ a.quiz.title }}</strong></td>
+                  <td><span class="score-pill">{{ a.score }}</span></td>
+                  <td>{{ a.total_marks }}</td>
+                  <td>{{ a.taken_at|date:"d M Y, H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5"><div class="empty-state"><span class="ei">📭</span>No exam attempts yet. Head to Exams to begin!</div></td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /results -->
+
+      <!-- ══════════════════════════════
+           PAGE: PAYMENT
+      ══════════════════════════════ -->
+      <div class="page" id="page-payment">
+
+        <!-- Current Status -->
+        <div class="status-card {% if days_left <= 2 %}s-danger{% elif days_left <= 5 %}s-warn{% else %}s-active{% endif %}" style="margin-bottom:1.5rem;">
+          <div class="s-info">
+            <div class="s-ico">💳</div>
+            <div>
+              <div class="s-label">Current Subscription</div>
+              <div class="s-meta">
+                <span>Expires: <strong>{{ subscription.end_date|date:"F j, Y" }}</strong></span>
+                <span><strong>{{ days_left }} days</strong> remaining</span>
+              </div>
+            </div>
+          </div>
+          <div class="s-badge">{% if days_left <= 2 %}🚨 Expired Soon{% elif days_left <= 5 %}⚠ Renew Soon{% else %}✔ Active{% endif %}</div>
+        </div>
+
+
+        <!-- Payment Form -->
+        <a href="{% url 'subscribe' %}" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:0.75rem 1.5rem; background:#16a34a; color:white; font-size:0.92rem; font-weight:700; border-radius:10px; text-decoration:none; box-shadow:0 2px 10px rgba(22,163,74,0.25); transition:background 0.18s;">
+         🚀 Proceed to Payment &amp; Activate
+        </a>
+
+      </div>    <!-- /payment -->
+
+      <!-- ══════════════════════════════
+           PAGE: PROFILE
+      ══════════════════════════════ -->
+      <div class="page" id="page-profile">
+
+        <!-- Profile Hero -->
+        <div class="profile-hero">
+          <div class="profile-avatar">{{ user.username|slice:":1"|upper }}</div>
+          <div>
+            <div class="profile-name">{{ user.get_full_name|default:user.username }}</div>
+            <div class="profile-id">Student ID: #EDU-{{ user.id|stringformat:"04d" }}</div>
+            <div class="profile-badges">
+              <div class="pbadge">🎓 Student</div>
+              <div class="pbadge">✅ Verified</div>
+              <div class="pbadge">📅 {{ subscription.end_date|date:"M Y" }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Info -->
+        <div class="card-box">
+          <div class="card-header-row">
+            <h3 class="card-title">👤 Personal Information</h3>
+            {% comment %} <button class="btn-outline">✏️ Edit Profile</button> {% endcomment %}
+          </div>
+          <div class="info-grid">
+            <div class="info-field">
+              <label>Username</label>
+              <div class="val">{{ user.username }}</div>
+            </div>
+            <div class="info-field">
+              <label>Full Name</label>
+              <div class="val">{{ user.get_full_name|default:"Not set" }}</div>
+            </div>
+            <div class="info-field">
+              <label>Email Address</label>
+              <div class="val">{{ user.email|default:"Not set" }}</div>
+            </div>
+            <div class="info-field">
+              <label>Member Since</label>
+              <div class="val">{{ user.date_joined|date:"F j, Y" }}</div>
+            </div>
+            <div class="info-field">
+              <label>Subscription Expires</label>
+              <div class="val">{{ subscription.end_date|date:"F j, Y" }}</div>
+            </div>
+            <div class="info-field">
+              <label>Total Exams Taken</label>
+              <div class="val">{{ attempts|length }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subject Progress -->
+        <div class="card-box">
+          <div class="card-header-row">
+            <h3 class="card-title">📈 Subject Progress</h3>
+          </div>
+          {% for quiz in quizzes %}
+          <div class="progress-item">
+            <div class="progress-top">
+              <span>{{ quiz.title }}</span>
+              <span style="color:var(--muted);">–%</span>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="empty-state"><span class="ei">📭</span>No subjects enrolled.</div>
+          {% endfor %}
+        </div>
+
+        <!-- Achievements -->
+        <div class="card-box">
+          <div class="card-header-row">
+            <h3 class="card-title">🏆 Achievements</h3>
+          </div>
+          <div class="achieve-grid">
+            <div class="achieve-item">
+              <span class="achieve-icon">🚀</span>
+              <div class="achieve-name">First Exam</div>
+              <div class="achieve-desc">Took your first exam</div>
+            </div>
+            <div class="achieve-item">
+              <span class="achieve-icon">🔥</span>
+              <div class="achieve-name">On a Streak</div>
+              <div class="achieve-desc">3 days in a row</div>
+            </div>
+            <div class="achieve-item">
+              <span class="achieve-icon">⭐</span>
+              <div class="achieve-name">High Scorer</div>
+              <div class="achieve-desc">Score above 80%</div>
+            </div>
+            <div class="achieve-item">
+              <span class="achieve-icon">🎯</span>
+              <div class="achieve-name">Focused</div>
+              <div class="achieve-desc">5 exams completed</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /profile -->
+
+    </div><!-- /page-content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+
+<!-- RESULT MODAL -->
+<div class="modal fade" id="resultModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">📊 Examination Results</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="results-table">
+            <thead><tr><th>Quiz</th><th>Score</th><th>Total</th><th>Date</th></tr></thead>
+            <tbody>
+              {% for a in attempts %}
+              <tr>
+                <td><strong>{{ a.quiz.title }}</strong></td>
+                <td><span class="score-pill">{{ a.score }}</span></td>
+                <td>{{ a.total_marks }}</td>
+                <td>{{ a.taken_at|date:"d M Y, H:i" }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="4"><div class="empty-state"><span class="ei">📭</span>No attempts yet. Start your first exam!</div></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
+
+</body>
+</html>

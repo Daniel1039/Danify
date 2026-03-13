@@ -1,0 +1,204 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DANIFY</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+     <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav>
+      <a href="#" class="nav-logo">
+        <span class="dot"></span>
+        DANIFY
+      </a>
+      <a href="{% url 'home' %}" class="nav-link">← Back to app</a>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+      <!-- LEFT -->
+      <div class="hero-left">
+        <span class="hero-tag">DANIFY CBT</span>
+        <h1 class="hero-title">We're here<br />to <em>listen</em></h1>
+        <p class="hero-desc">
+          Whether you have a question, found a bug, or simply want to share how
+          your journey is going — we'd love to hear from you.
+        </p>
+        <div class="hero-chips" id="chips">
+          <button class="chip active" data-val="General Enquiry">
+            General Enquiry
+          </button>
+          <button class="chip" data-val="Technical Support">
+            Technical Support
+          </button>
+          <button class="chip" data-val="Feedback">Feedback</button>
+          <button class="chip" data-val="Partnership">Partnership</button>
+          <button class="chip" data-val="Other">Other</button>
+        </div>
+      </div>
+
+      <!-- RIGHT / FORM -->
+      <div class="hero-right">
+        <p class="form-eyebrow">Send a message</p>
+        <h2 class="form-heading">We reply within<br />30 minutes.</h2>
+        {% if success %}
+          <div style="color:green; margin-bottom:20px;">
+              "Message Received - DANIFY CBT",
+              "Thank you for contacting DANIFY CBT. We will reply within 24 hours.",
+          </div>
+       {% endif %}
+       <!-- FORM -->
+<div class="form-body" id="formBody">
+  <form method="POST">
+    {% csrf_token %}
+
+    <div class="row-2">
+      <div class="field">
+        <label for="firstName">First name</label>
+        <input
+          type="text"
+          id="firstName"
+          name="firstName"
+          placeholder=""
+          autocomplete="given-name"
+        />
+        <span class="err-msg">Please enter your first name.</span>
+      </div>
+
+      <div class="field">
+        <label for="lastName">Last name</label>
+        <input
+          type="text"
+          id="lastName"
+          name="lastName"
+          placeholder=""
+          autocomplete="family-name"
+        />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="email">Email address</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder=""
+        autocomplete="email"
+      />
+      <span class="err-msg">Please enter a valid email.</span>
+    </div>
+
+    <div class="field">
+      <label for="subject">Subject</label>
+      <div class="select-wrap">
+        <select id="subject" name="subject">
+          <option value="General Enquiry">General Enquiry</option>
+          <option value="Technical Support">Technical Support</option>
+          <option value="Feedback">Feedback</option>
+          <option value="Partnership">Partnership</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="message">Your message</label>
+      <textarea
+        id="message"
+        name="message"
+        placeholder="Tell us what's on your mind…"
+      ></textarea>
+      <span class="err-msg">Please write your message.</span>
+    </div>
+
+    <button type="submit" class="btn-submit" id="submitBtn">
+      <span class="btn-text">Send Message →</span>
+      <span class="btn-loader"><span class="spinner"></span></span>
+    </button>
+
+    <p class="privacy-note">
+      Your message is private and never shared with third parties.
+    </p>
+  </form>
+</div>
+
+
+
+
+
+
+        <!-- SUCCESS -->
+        <div class="success-overlay" id="successOverlay">
+          <div class="success-icon">
+            <svg
+              width="30"
+              height="30"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h2>Message sent.</h2>
+          <p>
+            Thank you for reaching out. We'll get back to you within 24–48
+            hours.
+          </p>
+          <button class="btn-back" id="btnBack">← Send another</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- INFO BAR -->
+    <section class="info-bar">
+      <div class="info-card">
+        <h4>Email</h4>
+        <p><a href="mailto:hello@danify.app">makanjuola1039@gmail.com</a></p>
+      </div>
+      <div class="info-card">
+  <h4>WhatsApp</h4>
+  <p>
+    <a href="https://wa.me/2349068398792" target="_blank" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:#25D366;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#25D366">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      WhatsApp
+    </a>
+  </p>
+</div>
+      <div class="info-card">
+        <h4>Support hours</h4>
+        <p>Mon – Fri · 9am – 6pm GMT</p>
+      </div>
+      <div class="info-card">
+        <h4>About us</h4>
+        <p>
+          A small team building evidence-based CBT tools — DANIFY makes mental
+          wellness accessible to everyone, everywhere.
+        </p>
+      </div>
+      <div class="crisis-note">
+        <p>
+          <strong>Need urgent support?</strong> If you're in crisis or
+          experiencing a mental health emergency, please contact your local
+          emergency services or a crisis helpline immediately. This form is not
+          monitored 24/7.
+        </p>
+      </div>
+    </section>
+    
+
+<script src="{% static 'js/contact.js' %}"></script>
+  </body>
+</html>

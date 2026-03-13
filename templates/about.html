@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DANIFY</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+</head>
+
+<body>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="mobileClose" aria-label="Close menu">&#x2715;</button>
+  <ul>
+    <li><a href="{% url 'home' %}" onclick="closeMenu()">Home</a></li>
+    <li><a href="#features" onclick="closeMenu()">Features</a></li>
+    <li><a href="{% url 'pricing' %}" onclick="closeMenu()">Pricing</a></li>
+    <li><a href="{% url 'about' %}" onclick="closeMenu()">About</a></li>
+    <li><a href="{% url 'contact' %}" onclick="closeMenu()">Contact</a></li>
+  </ul>
+  <div class="mobile-menu-buttons">
+    <a href="{% url 'register'%}" class="btn btn-primary">register</a>
+    <a href="{% url 'login' %}" class="btn btn-secondary">Login</a>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-container">
+    <a href="#" class="logo">
+      <div class="logo-icon">DA</div>
+      <span>DANIFY</span>  
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      {% comment %} <li><a href="#features">Features</a></li> {% endcomment %}
+      <li><a href="{% url 'pricing' %}">Pricing</a></li>
+      <li><a href="{% url 'about' %}">About</a></li>
+      <li><a href="{% url 'contact'%}">Contact</a></li>
+    </ul>
+
+    <div class="nav-buttons">
+      <a href="{% url 'register'%}" class="btn btn-primary">register</a>
+      <a href="{%url 'login'%}" class="btn btn-secondary">Login</a>
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</nav>
+
+<section class="page-header">
+  <h1>About DANIFY</h1>
+  <p>We are building the future of AI-powered exam preparation for students who want to win.</p>
+</section>
+
+<section class="mission">
+  <div class="mission-container">
+    <div>
+      <h2>Our Mission</h2>
+      <p>To help students prepare smarter using AI-powered simulations, instant feedback, and personalized learning insights.</p>
+    </div>
+    <div class="mission-visual">🎓</div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h2>10K+</h2>
+      <p>Students</p>
+    </div>
+    <div class="stat-card">
+      <h2>95%</h2>
+      <p>Success Rate</p>
+    </div>
+    <div class="stat-card">
+      <h2>500K+</h2>
+      <p>Practice Questions</p>
+    </div>
+    <div class="stat-card">
+      <h2>24/7</h2>
+      <p>AI Support</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-container">
+    <div class="footer-column">
+      <h4>DANIFY</h4>
+      <p style="color:var(--gray);">AI-powered learning platform built for ambitious students.</p>
+    </div>
+    <div class="footer-column">
+      <h4>Company</h4>
+      <a href="{% url 'about' %}">About</a>
+      <a href="{% url 'pricing'%}">Pricing</a>
+      <a href="#">Careers</a>
+    </div>
+    <div class="footer-column">
+      <h4>Support</h4>
+      <a href="#">Help Center</a>
+      <a href="{% url 'contact'%}">Contact</a>
+      <a href="#">Terms</a>
+    </div>
+    {% comment %} <div class="footer-column"> {% endcomment %}
+      {% comment %} <h4>Follow</h4> {% endcomment %}
+      {% comment %} <a href="#">Twitter</a> {% endcomment %}
+      {% comment %} <a href="#">Instagram</a> {% endcomment %}
+      {% comment %} <a href="#">LinkedIn</a> {% endcomment %}
+    {% comment %} </div> {% endcomment %}
+  </div>
+</footer>
+<script src="{% static 'js/about.js' %}"></script>
+
+</body>
+</html>

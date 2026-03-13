@@ -26,6 +26,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # add this after SecurityMiddleware
+    # ... other middleware
 ]
 
 ROOT_URLCONF = 'cbt_project.urls'
@@ -72,6 +75,8 @@ LOGIN_REDIRECT_URL = '/dashboard/'        # Redirect to dashboard after login
 LOGOUT_REDIRECT_URL = '/login/'           # Redirect to login page after logout
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_URL = "/static/"
 
 
 # Allow more fields in POST requests

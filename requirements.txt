@@ -13,3 +13,4 @@ six==1.17.0
 sqlparse==0.5.4
 tablib==3.9.0
 tzdata==2025.2
+whitenoise==6.12.0

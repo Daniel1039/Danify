@@ -13,19 +13,32 @@ from .models import ContactMessage
 
 from django.shortcuts import render
 from .models import StudentProfile, Quiz
+from django.shortcuts import render
+from cbtapp.models import SomeModel  # replace with your model if needed
+
 def home(request):
-    try:
-        profile = StudentProfile.objects.get(user=request.user)
+    user_data = None  # default if user is anonymous
 
-        quizzes = Quiz.objects.filter(
-            school_class=profile.school_class,
-            arms=profile.arm
-        )
+    # Only fetch user-specific data if logged in
+    if request.user.is_authenticated:
+        user_data = SomeModel.objects.filter(user=request.user).first()
+    
+    return render(request, 'home.html', {
+        'user_data': user_data,  # will be None for anonymous users
+    })
+# def home(request):
+#     try:
+#         profile = StudentProfile.objects.get(user=request.user)
 
-    except StudentProfile.DoesNotExist:
-        quizzes = Quiz.objects.none()
+#         quizzes = Quiz.objects.filter(
+#             school_class=profile.school_class,
+#             arms=profile.arm
+#         )
 
-    return render(request, 'home.html', {'quizzes': quizzes})
+#     except StudentProfile.DoesNotExist:
+#         quizzes = Quiz.objects.none()
+
+#     return render(request, 'home.html', {'quizzes': quizzes})
 def pricing(request):
     return render(request, 'pricing.html')
 

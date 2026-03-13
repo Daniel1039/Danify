@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DANIFY</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html,body{
+width:100%;
+max-width:100%;
+overflow-x:hidden;
+}
+
+:root{
+--primary:#FF3D00;
+--primary-dark:#D32F00;
+--secondary:#00E5FF;
+--dark:#0A0E27;
+--darker:#050813;
+--light:#F8F9FA;
+--gray:#8B92A7;
+--success:#00FF88;
+}
+
+body{
+font-family:'DM Sans',sans-serif;
+background:var(--darker);
+color:var(--light);
+line-height:1.6;
+}
+
+/* NAV */
+nav{
+position:fixed;
+top:0;
+width:100%;
+padding:1rem 5%;
+background:rgba(10,14,39,.95);
+backdrop-filter:blur(20px);
+z-index:1000;
+}
+
+.nav-container{
+max-width:1400px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:.5rem;
+font-family:'Archivo Black';
+font-size:1.4rem;
+color:white;
+text-decoration:none;
+}
+
+.logo-icon{
+width:36px;
+height:36px;
+background:linear-gradient(135deg,var(--primary),var(--secondary));
+border-radius:8px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:.85rem;
+font-weight:900;
+}
+
+.nav-links{
+display:flex;
+gap:2rem;
+list-style:none;
+}
+
+.nav-links a{
+color:var(--gray);
+text-decoration:none;
+transition:color .2s;
+}
+
+.nav-links a:hover{
+color:white;
+}
+
+.nav-buttons{
+display:flex;
+gap:.75rem;
+align-items:center;
+}
+
+.btn{
+padding:.7rem 1.4rem;
+border-radius:8px;
+font-weight:600;
+text-decoration:none;
+display:inline-block;
+cursor:pointer;
+transition:opacity .2s;
+font-family:'DM Sans',sans-serif;
+font-size:1rem;
+border:none;
+}
+
+.btn:hover{opacity:.85;}
+
+.btn-primary{
+background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+color:white;
+}
+
+.btn-secondary{
+border:1px solid rgba(255,255,255,.2);
+color:white;
+background:transparent;
+}
+
+/* HAMBURGER */
+.hamburger{
+display:none;
+flex-direction:column;
+gap:5px;
+cursor:pointer;
+padding:4px;
+background:none;
+border:none;
+}
+
+.hamburger span{
+display:block;
+width:24px;
+height:2px;
+background:white;
+border-radius:2px;
+transition:transform .3s, opacity .3s;
+}
+
+/* MOBILE MENU */
+.mobile-menu{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(5,8,19,.97);
+z-index:999;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:2rem;
+}
+
+.mobile-menu.open{
+display:flex;
+}
+
+.mobile-menu ul{
+list-style:none;
+text-align:center;
+display:flex;
+flex-direction:column;
+gap:1.5rem;
+}
+
+.mobile-menu ul a{
+font-family:'Archivo Black';
+font-size:1.8rem;
+color:white;
+text-decoration:none;
+transition:color .2s;
+}
+
+.mobile-menu ul a:hover{
+color:var(--primary);
+}
+
+.mobile-menu-buttons{
+display:flex;
+flex-direction:column;
+gap:.75rem;
+width:200px;
+}
+
+.mobile-menu-buttons .btn{
+text-align:center;
+}
+
+.mobile-close{
+position:absolute;
+top:1.5rem;
+right:5%;
+background:none;
+border:none;
+color:white;
+font-size:1.8rem;
+cursor:pointer;
+line-height:1;
+}
+
+/* Hamburger active state */
+.hamburger.active span:nth-child(1){
+transform:translateY(7px) rotate(45deg);
+}
+.hamburger.active span:nth-child(2){
+opacity:0;
+}
+.hamburger.active span:nth-child(3){
+transform:translateY(-7px) rotate(-45deg);
+}
+
+/* HEADER */
+.page-header{
+padding:7rem 5% 3rem;
+text-align:center;
+}
+
+.page-header h1{
+font-family:'Archivo Black';
+font-size:2.5rem;
+margin-bottom:1rem;
+}
+
+.page-header p{
+color:var(--gray);
+max-width:700px;
+margin:auto;
+}
+
+/* MISSION */
+.mission{
+padding:4rem 5%;
+}
+
+.mission-container{
+max-width:1400px;
+margin:auto;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:3rem;
+align-items:center;
+}
+
+.mission-container h2{
+font-family:'Archivo Black';
+font-size:1.8rem;
+margin-bottom:1rem;
+}
+
+.mission-visual{
+min-height:220px;
+background:linear-gradient(135deg,rgba(255,61,0,.2),rgba(0,229,255,.2));
+border-radius:20px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:3rem;
+}
+
+/* STATS */
+.stats{
+padding:4rem 5%;
+}
+
+.stats-grid{
+max-width:1200px;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:1.5rem;
+text-align:center;
+}
+
+.stat-card{
+background:rgba(255,255,255,.05);
+padding:2rem;
+border-radius:16px;
+}
+
+.stat-card h2{
+font-family:'Archivo Black';
+font-size:2rem;
+color:var(--primary);
+margin-bottom:.5rem;
+}
+
+/* FOOTER */
+footer{
+padding:4rem 5%;
+background:var(--dark);
+}
+
+.footer-container{
+max-width:1400px;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:2rem;
+}
+
+.footer-column h4{
+font-family:'Archivo Black';
+margin-bottom:1rem;
+}
+
+.footer-column a{
+display:block;
+color:var(--gray);
+text-decoration:none;
+margin-bottom:.5rem;
+transition:color .2s;
+}
+
+.footer-column a:hover{
+color:white;
+}
+
+/* RESPONSIVE */
+@media(max-width:992px){
+.mission-container{
+grid-template-columns:1fr;
+text-align:center;
+}
+}
+
+@media(max-width:768px){
+.nav-links,
+.nav-buttons{
+display:none;
+}
+
+.hamburger{
+display:flex;
+}
+
+.page-header{
+padding:6.5rem 5% 2.5rem;
+}
+}
+
+@media(max-width:480px){
+.page-header h1{
+font-size:2rem;
+}
+}
+</style>
+</head>
+
+<body>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="mobileClose" aria-label="Close menu">&#x2715;</button>
+  <ul>
+    <li><a href="{% url 'home' %}" onclick="closeMenu()">Home</a></li>
+    <li><a href="#features" onclick="closeMenu()">Features</a></li>
+    <li><a href="{% url 'pricing' %}" onclick="closeMenu()">Pricing</a></li>
+    <li><a href="{% url 'about' %}" onclick="closeMenu()">About</a></li>
+    <li><a href="{% url 'contact' %}" onclick="closeMenu()">Contact</a></li>
+  </ul>
+  <div class="mobile-menu-buttons">
+    <a href="{% url 'register'%}" class="btn btn-primary">register</a>
+    <a href="{% url 'login' %}" class="btn btn-secondary">Login</a>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-container">
+    <a href="#" class="logo">
+      <div class="logo-icon">DA</div>
+      <span>DANIFY</span>  
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      {% comment %} <li><a href="#features">Features</a></li> {% endcomment %}
+      <li><a href="{% url 'pricing' %}">Pricing</a></li>
+      <li><a href="{% url 'about' %}">About</a></li>
+      <li><a href="{% url 'contact'%}">Contact</a></li>
+    </ul>
+
+    <div class="nav-buttons">
+      <a href="{% url 'register'%}" class="btn btn-primary">register</a>
+      <a href="{%url 'login'%}" class="btn btn-secondary">Login</a>
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</nav>
+
+<section class="page-header">
+  <h1>About DANIFY</h1>
+  <p>We are building the future of AI-powered exam preparation for students who want to win.</p>
+</section>
+
+<section class="mission">
+  <div class="mission-container">
+    <div>
+      <h2>Our Mission</h2>
+      <p>To help students prepare smarter using AI-powered simulations, instant feedback, and personalized learning insights.</p>
+    </div>
+    <div class="mission-visual">🎓</div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h2>10K+</h2>
+      <p>Students</p>
+    </div>
+    <div class="stat-card">
+      <h2>95%</h2>
+      <p>Success Rate</p>
+    </div>
+    <div class="stat-card">
+      <h2>500K+</h2>
+      <p>Practice Questions</p>
+    </div>
+    <div class="stat-card">
+      <h2>24/7</h2>
+      <p>AI Support</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-container">
+    <div class="footer-column">
+      <h4>DANIFY</h4>
+      <p style="color:var(--gray);">AI-powered learning platform built for ambitious students.</p>
+    </div>
+    <div class="footer-column">
+      <h4>Company</h4>
+      <a href="{% url 'about' %}">About</a>
+      <a href="{% url 'pricing'%}">Pricing</a>
+      <a href="#">Careers</a>
+    </div>
+    <div class="footer-column">
+      <h4>Support</h4>
+      <a href="#">Help Center</a>
+      <a href="{% url 'contact'%}">Contact</a>
+      <a href="#">Terms</a>
+    </div>
+    {% comment %} <div class="footer-column"> {% endcomment %}
+      {% comment %} <h4>Follow</h4> {% endcomment %}
+      {% comment %} <a href="#">Twitter</a> {% endcomment %}
+      {% comment %} <a href="#">Instagram</a> {% endcomment %}
+      {% comment %} <a href="#">LinkedIn</a> {% endcomment %}
+    {% comment %} </div> {% endcomment %}
+  </div>
+</footer>
+
+<script>
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+const mobileClose = document.getElementById('mobileClose');
+
+function openMenu(){
+  mobileMenu.classList.add('open');
+  hamburger.classList.add('active');
+  document.body.style.overflow='hidden';
+}
+
+function closeMenu(){
+  mobileMenu.classList.remove('open');
+  hamburger.classList.remove('active');
+  document.body.style.overflow='';
+}
+
+hamburger.addEventListener('click', openMenu);
+mobileClose.addEventListener('click', closeMenu);
+
+// Close on outside click
+mobileMenu.addEventListener('click', function(e){
+  if(e.target === mobileMenu) closeMenu();
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeMenu();
+});
+</script>
+
+</body>
+</html>

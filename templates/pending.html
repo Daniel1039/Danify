@@ -1,0 +1,287 @@
+<!-- pending.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Pending</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #eff6ff;
+        --accent: #f59e0b;
+        --surface: #ffffff;
+        --bg: #f0f4ff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --border: #e2e8f0;
+        --radius: 20px;
+        --shadow: 0 8px 40px rgba(37,99,235,0.12);
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: 'DM Sans', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 2.5rem 1rem 3rem;
+        position: relative;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        top: -120px; left: -120px;
+        width: 400px; height: 400px;
+        background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      body::after {
+        content: '';
+        position: fixed;
+        bottom: -100px; right: -100px;
+        width: 350px; height: 350px;
+        background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .pending-card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        padding: 2.75rem 2.25rem;
+        max-width: 440px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+        animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+      }
+
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .icon-ring {
+        width: 90px; height: 90px;
+        margin: 0 auto 1.5rem;
+        position: relative;
+      }
+
+      .icon-ring svg {
+        width: 90px; height: 90px;
+        position: absolute;
+        top: 0; left: 0;
+        animation: spin 3s linear infinite;
+      }
+
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+      }
+
+      .icon-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+      }
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #fffbeb;
+        color: #92400e;
+        border: 1.5px solid #fde68a;
+        border-radius: 99px;
+        padding: 5px 14px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-bottom: 1.25rem;
+      }
+
+      .badge-dot {
+        width: 7px; height: 7px;
+        background: var(--accent);
+        border-radius: 50%;
+        animation: pulse 1.4s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50%       { transform: scale(1.5); opacity: 0.5; }
+      }
+
+      h2 {
+        font-family: 'Sora', sans-serif;
+        font-size: 1.55rem;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.5px;
+        margin-bottom: 0.6rem;
+      }
+
+      .subtitle {
+        font-size: 0.9rem;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-bottom: 1.75rem;
+      }
+
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+        margin-bottom: 2rem;
+        text-align: left;
+      }
+
+      .step {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+      }
+
+      .step-icon {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .step-text {
+        font-size: 0.85rem;
+        color: var(--text);
+        font-weight: 500;
+        line-height: 1.5;
+      }
+
+      .step-text span {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 1px;
+        font-weight: 400;
+      }
+
+      /* ── BUTTON ───────────────────────────── */
+      a.btn-home {
+        display: block !important;
+        width: 100% !important;
+        background: #2563eb !important;
+        color: #ffffff !important;
+        text-decoration: none !important;
+        border-radius: 12px !important;
+        padding: 0.85rem 1rem !important;
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
+        font-family: 'Sora', sans-serif !important;
+        text-align: center !important;
+        transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+        box-shadow: 0 4px 14px rgba(37,99,235,0.25) !important;
+        margin-top: 0.25rem;
+      }
+
+      a.btn-home:hover {
+        background: #1d4ed8 !important;
+        box-shadow: 0 6px 20px rgba(37,99,235,0.35) !important;
+        transform: translateY(-1px);
+        color: #ffffff !important;
+        text-decoration: none !important;
+      }
+
+      /* ── FOOTER NOTE ──────────────────────── */
+      p.footer-note {
+        display: block !important;
+        margin-top: 1.25rem !important;
+        font-size: 0.76rem !important;
+        color: #64748b !important;
+        line-height: 1.5 !important;
+      }
+
+      @media (max-width: 480px) {
+        .pending-card { padding: 2rem 1.4rem; }
+        h2 { font-size: 1.3rem; }
+      }
+    </style>
+</head>
+<body>
+
+  <div class="pending-card">
+
+    <div class="icon-ring">
+      <svg viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="45" cy="45" r="40" stroke="#e2e8f0" stroke-width="4"/>
+        <path d="M45 5 A40 40 0 0 1 85 45" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <div class="icon-center">⏳</div>
+    </div>
+
+    <div class="status-badge">
+      <span class="badge-dot"></span>
+      Awaiting Verification
+    </div>
+
+    <h2>Payment Submitted!</h2>
+    <p class="subtitle">
+      Your payment receipt has been submitted and is pending approval by the admin.
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-icon">✅</span>
+        <div class="step-text">
+          Receipt Uploaded
+          <span>Your proof of payment has been received.</span>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-icon">🔍</span>
+        <div class="step-text">
+          Admin Review in Progress
+          <span>Your payment is being verified by the admin team.</span>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-icon">🚀</span>
+        <div class="step-text">
+          Dashboard Access Granted
+          <span>You'll get full access once verification is complete.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Button -->
+    <a href="{% url 'home' %}" class="btn-home">
+      ← Go Back to home
+    </a>
+
+    <p class="footer-note">
+      This usually takes less than 24 hours. Please check back later.
+    </p>
+
+  </div>
+
+</body>
+</html>

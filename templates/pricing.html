@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DANIFY</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+
+<style>
+
+/* ================= GLOBAL ================= */
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html,body{
+width:100%;
+max-width:100%;
+overflow-x:hidden;
+}
+
+:root{
+--primary:#ff3d00;
+--primary-dark:#d32f00;
+--secondary:#00e5ff;
+--dark:#0a0e27;
+--darker:#050813;
+--light:#f8f9fa;
+--gray:#8b92a7;
+--success:#00ff88;
+}
+
+body{
+font-family:"DM Sans",sans-serif;
+background:var(--darker);
+color:var(--light);
+line-height:1.6;
+}
+
+/* ================= NAV ================= */
+
+nav{
+position:fixed;
+top:0;
+width:100%;
+z-index:1000;
+padding:1rem 5%;
+background:rgba(10,14,39,.92);
+backdrop-filter:blur(20px);
+border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.nav-container{
+max-width:1400px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:.5rem;
+font-family:"Archivo Black";
+font-size:1.4rem;
+color:white;
+text-decoration:none;
+}
+
+.logo-icon{
+width:40px;
+height:40px;
+background:linear-gradient(135deg,var(--primary),var(--secondary));
+border-radius:8px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+}
+
+.nav-links{
+display:flex;
+gap:2rem;
+list-style:none;
+}
+
+.nav-links a{
+color:var(--gray);
+text-decoration:none;
+}
+
+.nav-links a:hover{
+color:white;
+}
+
+.nav-buttons{
+display:flex;
+gap:1rem;
+}
+
+.hamburger{
+display:none;
+flex-direction:column;
+justify-content:space-between;
+width:28px;
+height:20px;
+background:none;
+border:none;
+cursor:pointer;
+}
+
+.hamburger span{
+height:2px;
+background:white;
+border-radius:2px;
+}
+
+/* ================= MOBILE MENU ================= */
+
+.mobile-menu{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100vh;
+background:rgba(5,8,19,.98);
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:2rem;
+opacity:0;
+pointer-events:none;
+transition:.3s;
+}
+
+.mobile-menu.open{
+opacity:1;
+pointer-events:auto;
+}
+
+.mobile-menu ul{
+list-style:none;
+text-align:center;
+}
+
+.mobile-menu ul li{
+margin-bottom:1.5rem;
+}
+
+.mobile-menu ul a{
+color:white;
+font-family:"Archivo Black";
+font-size:1.6rem;
+text-decoration:none;
+}
+
+.mobile-btns{
+display:flex;
+flex-direction:column;
+gap:1rem;
+width:80%;
+max-width:300px;
+}
+
+/* ================= HEADER ================= */
+
+.page-header{
+padding:8rem 5% 3rem;
+text-align:center;
+}
+
+.page-title{
+font-family:"Archivo Black";
+font-size:clamp(2rem,6vw,3.5rem);
+margin-bottom:1rem;
+}
+
+.page-subtitle{
+color:var(--gray);
+max-width:600px;
+margin:auto;
+}
+
+/* ================= PRICING ================= */
+
+.pricing-section{
+padding:3rem 5% 5rem;
+}
+
+.pricing-grid{
+max-width:1200px;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:2rem;
+}
+
+.pricing-card{
+background:rgba(255,255,255,.03);
+border:1px solid rgba(255,255,255,.05);
+border-radius:20px;
+padding:2rem;
+position:relative;
+transition:.3s;
+}
+
+.pricing-card:hover{
+transform:translateY(-5px);
+border-color:var(--primary);
+}
+
+.pricing-card.featured{
+border-color:var(--primary);
+background:rgba(255,61,0,.05);
+}
+
+.featured-badge{
+position:absolute;
+top:-12px;
+right:20px;
+background:linear-gradient(135deg,var(--primary),var(--secondary));
+padding:.4rem 1rem;
+border-radius:30px;
+font-size:.75rem;
+font-weight:700;
+white-space:nowrap;
+}
+
+.plan-name{
+font-family:"Archivo Black";
+font-size:1.4rem;
+margin-bottom:.5rem;
+}
+
+.plan-price{
+font-family:"Archivo Black";
+font-size:2.5rem;
+color:var(--primary);
+margin-bottom:1rem;
+}
+
+.plan-price span{
+font-size:1rem;
+color:var(--gray);
+font-family:"DM Sans";
+}
+
+.plan-features{
+list-style:none;
+margin-bottom:2rem;
+}
+
+.plan-features li{
+padding:.6rem 0;
+border-bottom:1px solid rgba(255,255,255,.05);
+display:flex;
+gap:.5rem;
+}
+
+.plan-features li:last-child{
+border:none;
+}
+
+.checkmark{
+color:var(--success);
+font-weight:bold;
+}
+
+.btn{
+padding:.8rem 1.5rem;
+border-radius:8px;
+text-decoration:none;
+font-weight:600;
+display:inline-block;
+text-align:center;
+}
+
+.btn-primary{
+background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+color:white;
+}
+
+.btn-secondary{
+border:1px solid rgba(255,255,255,.2);
+color:white;
+}
+
+.btn-full{
+width:100%;
+}
+
+.mobile-menu {
+  /* ...existing styles... */
+  z-index: 1100; /* ADD THIS */
+}
+
+.mobile-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 5%;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+padding:3rem 5%;
+border-top:1px solid rgba(255,255,255,.05);
+margin-top:3rem;
+}
+
+.footer-container{
+max-width:1200px;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:2rem;
+}
+
+.footer-section h4{
+margin-bottom:1rem;
+}
+
+.footer-section ul{
+list-style:none;
+}
+
+.footer-section li{
+margin-bottom:.5rem;
+}
+
+.footer-section a{
+color:var(--gray);
+text-decoration:none;
+}
+
+.footer-section a:hover{
+color:var(--primary);
+}
+
+.footer-bottom{
+text-align:center;
+margin-top:2rem;
+color:var(--gray);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:768px){
+
+.nav-links,
+.nav-buttons{
+display:none;
+}
+
+.hamburger{
+display:flex;
+}
+
+.page-header{
+padding:7rem 5% 2rem;
+}
+
+.pricing-section{
+padding:2rem 4% 4rem;
+}
+
+}
+
+@media(max-width:400px){
+
+.plan-price{
+font-size:2rem;
+}
+
+.pricing-card{
+padding:1.5rem;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<nav>
+<div class="nav-container">
+<a href="#" class="logo">
+<div class="logo-icon">DA</div>
+<span>DANIFY</span>
+</a>
+ <ul class="nav-links">
+   <li><a href="{% url 'home' %}">Home</a></li>
+   {% comment %} <li><a href="#features">Features</a></li> {% endcomment %}
+   <li><a href="{% url 'pricing' %}">Pricing</a></li>
+   <li><a href="{% url 'about' %}">About</a></li>
+   <li><a href="{% url 'contact'%}">Contact</a></li>
+ </ul>
+
+<div class="nav-buttons">
+<a href="{% url 'register'%}" class="btn btn-primary">register</a>
+<a href="{% url 'login' %}" class="btn btn-secondary">Login</a>
+</div>
+
+<button class="hamburger" id="hamburger">
+<span></span>
+<span></span>
+<span></span>
+</button>
+</div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <ul>
+    <li><a href="{% url 'home' %}" onclick="closeMenu()">Home</a></li>
+    <li><a href="#features" onclick="closeMenu()">Features</a></li>
+    <li><a href="{% url 'pricing' %}" onclick="closeMenu()">Pricing</a></li>
+    <li><a href="{% url 'about' %}" onclick="closeMenu()">About</a></li>
+    <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
+  </ul>
+<div class="mobile-btns">
+<a href="{% url 'register'%}" class="btn btn-primary">register</a>
+<a href="{% url 'login'%}" class="btn btn-secondary">Login</a>
+</div>
+</div>
+
+<div class="page-header">
+<h1 class="page-title">Simple Pricing</h1>
+<p class="page-subtitle">Choose your plan and start preparing smarter.</p>
+</div>
+
+<section class="pricing-section">
+<div class="pricing-grid">
+
+<div class="pricing-card">
+<h3 class="plan-name">Beginner</h3>
+<div class="plan-price">₦5,000<span>/mo</span></div>
+<ul class="plan-features">
+<li><span class="checkmark">✓</span>5 tests</li>
+<li><span class="checkmark">✓</span>Basic analytics</li>
+</ul>
+<a href="#" class="btn btn-secondary btn-full">Get Started</a>
+</div>
+
+<div class="pricing-card featured">
+<div class="featured-badge">Popular</div>
+<h3 class="plan-name">Pro</h3>
+<div class="plan-price">₦7,000<span>/mo</span></div>
+<ul class="plan-features">
+<li><span class="checkmark">✓</span>Unlimited tests</li>
+<li><span class="checkmark">✓</span>AI tutor</li>
+</ul>
+<a href="#" class="btn btn-primary btn-full">Start Trial</a>
+</div>
+
+<div class="pricing-card">
+<h3 class="plan-name">Premium</h3>
+<div class="plan-price">₦8,000<span>/mo</span></div>
+<ul class="plan-features">
+<li><span class="checkmark">✓</span>Everything in Pro</li>
+<li><span class="checkmark">✓</span>Team access</li>
+</ul>
+<a href="#" class="btn btn-primary btn-full">Contact Sales</a>
+</div>
+
+</div>
+</section>
+
+<footer>
+<div class="footer-container">
+<div class="footer-section">
+<h4>DANIFY</h4>
+<p>Smart exam preparation platform.</p>
+</div>
+<div class="footer-section">
+<h4>Links</h4>
+<ul class="nav-links">
+<li><a href="{% url 'home' %}">Home</a></li>
+{% comment %} <li><a href="#features">Features</a></li> {% endcomment %}
+<li><a href="{% url 'pricing' %}">Pricing</a></li>
+<li><a href="{% url 'about' %}">About</a></li>
+<li><a href="{% url 'contact'%}">Contact</a></li>
+</ul>
+</div>
+</div>
+<div class="footer-bottom">
+© 2026 DANIFY
+</div>
+</footer>
+
+<script>
+const hamburger=document.getElementById("hamburger");
+const mobileMenu=document.getElementById("mobileMenu");
+
+hamburger.addEventListener("click",()=>{
+mobileMenu.classList.toggle("open");
+document.body.style.overflow=mobileMenu.classList.contains("open")?"hidden":"";
+});
+
+function closeMobileMenu(){
+mobileMenu.classList.remove("open");
+document.body.style.overflow="";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,346 @@
+{% block content %}
+
+<style>
+    body {
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        background: #f4f6f9;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 30px auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .filter-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .filter-form label {
+        font-weight: 600;
+        color: #444;
+    }
+
+    .filter-form select {
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        min-width: 180px;
+    }
+
+    .btn {
+        padding: 8px 14px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-view {
+        background: #007bff;
+        color: #fff;
+    }
+
+    .btn-download {
+        background: #28a745;
+        color: #fff;
+    }
+
+    .btn-print {
+        background: #17a2b8;
+        color: #fff;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    table th {
+        background: #343a40;
+        color: #fff;
+        padding: 10px;
+        text-align: left;
+    }
+
+    table td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    table tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 20px;
+        font-weight: bold;
+        color: #777;
+    }
+
+    @media print {
+        .filter-form {
+            display: none;
+        }
+    }
+</style>
+
+<div class="container">
+
+    <h2>📊 Quiz Results</h2>
+
+    <form method="get" class="filter-form">
+
+        <!-- CLASS -->
+        <div>
+            <label>Select Class</label><br>
+            <select name="class" required>
+                <option value="">-- Select Class --</option>
+                {% for cls in classes %}
+                    <option value="{{ cls.id }}"
+                        {% if cls.id|stringformat:"s" == selected_class %} selected {% endif %}
+                    >
+                        {{ cls.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- QUIZ -->
+        <div>
+            <label>Select Quiz</label><br>
+            <select name="quiz">
+                <option value="">-- All Quizzes --</option>
+                {% for quiz in quizzes %}
+                    <option value="{{ quiz.id }}"
+                        {% if quiz.id|stringformat:"s" == selected_quiz %} selected {% endif %}
+                    >
+                        {{ quiz.title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="margin-top:22px;">
+            <button type="submit" class="btn btn-view">View Results</button>
+
+            {% if selected_class %}
+                <a href="?class={{ selected_class }}&quiz={{ selected_quiz }}&download=1"
+                   class="btn btn-download">
+                   Download CSV
+                </a>
+
+                <button type="button" onclick="window.print()" class="btn btn-print">
+                   Print
+                </button>
+            {% endif %}
+        </div>
+
+    </form>
+
+    <table>
+        <tr>
+            <th>Class</th>
+            <th>Student</th>
+            <th>Subject</th>
+            <th>Score</th>
+            <th>Total</th>
+        </tr>
+
+        {% for a in attempts %}
+        <tr>
+            <td>{{ a.user.studentprofile.school_class.name }}</td>
+            <td>{{ a.user.username }}</td>
+            <td>{{ a.quiz.title }}</td>
+            <td>{{ a.score }}</td>
+            <td>{{ a.total_marks }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="empty">No results found</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends "base.html" %} {% endcomment %}
+{% comment %} {% block content %} {% endcomment %}
+{% comment %}  {% endcomment %}
+{% comment %} <h2>Quiz Results</h2> {% endcomment %}
+{% comment %}  {% endcomment %}
+{% comment %} <form method="get"> {% endcomment %}
+{% comment %}  {% endcomment %}
+    {% comment %} <!-- CLASS --> {% endcomment %}
+    {% comment %} <label>Select Class:</label> {% endcomment %}
+    {% comment %} <select name="class" required> {% endcomment %}
+        {% comment %} <option value="">-- Select Class --</option> {% endcomment %}
+        {% comment %} {% for cls in classes %} {% endcomment %}
+            {% comment %} <option value="{{ cls.id }}" {% endcomment %}
+                {% comment %} {% if cls.id|stringformat:"s" == selected_class %} {% endcomment %}
+                    {% comment %} selected {% endcomment %}
+                {% comment %} {% endif %} {% endcomment %}
+            {% comment %} > {% endcomment %}
+                {% comment %} {{ cls.name }} {% endcomment %}
+            {% comment %} </option> {% endcomment %}
+        {% comment %} {% endfor %} {% endcomment %}
+    {% comment %} </select> {% endcomment %}
+{% comment %}  {% endcomment %}
+    {% comment %} <!-- SUBJECT --> {% endcomment %}
+    {% comment %} <label>Select Quiz:</label> {% endcomment %}
+    {% comment %} <select name="quiz"> {% endcomment %}
+        {% comment %} <option value="">-- All Quizs --</option> {% endcomment %}
+        {% comment %} {% for quiz in quizzes %} {% endcomment %}
+            {% comment %} <option value="{{ quiz.id }}" {% endcomment %}
+                {% comment %} {% if quiz.id|stringformat:"s" == selected_quiz %} {% endcomment %}
+                    {% comment %} selected {% endcomment %}
+                {% comment %} {% endif %} {% endcomment %}
+            {% comment %} > {% endcomment %}
+                {% comment %} {{ quiz.title }} {% endcomment %}
+            {% comment %} </option> {% endcomment %}
+        {% comment %} {% endfor %} {% endcomment %}
+    {% comment %} </select> {% endcomment %}
+{% comment %}  {% endcomment %}
+    {% comment %} <button type="submit">View</button> {% endcomment %}
+{% comment %}  {% endcomment %}
+    {% comment %} {% if selected_class %} {% endcomment %}
+        {% comment %} <a href="?class={{ selected_class }}&quiz={{ selected_quiz }}&download=1" {% endcomment %}
+           {% comment %} style="padding:5px 10px;background:green;color:white;text-decoration:none;"> {% endcomment %}
+           {% comment %} Download CSV {% endcomment %}
+        {% comment %} </a> {% endcomment %}
+{% comment %}  {% endcomment %}
+        {% comment %} <button type="button" onclick="window.print()" {% endcomment %}
+           {% comment %} style="padding:5px 10px;background:blue;color:white;border:none;"> {% endcomment %}
+           {% comment %} Print {% endcomment %}
+        {% comment %} </button> {% endcomment %}
+    {% comment %} {% endif %} {% endcomment %}
+{% comment %} </form> {% endcomment %}
+{% comment %}  {% endcomment %}
+{% comment %} <hr> {% endcomment %}
+{% comment %}  {% endcomment %}
+{% comment %} <table border="1" width="100%" cellpadding="5"> {% endcomment %}
+    {% comment %} <tr> {% endcomment %}
+        {% comment %} <th>Class</th> {% endcomment %}
+        {% comment %} <th>Student</th> {% endcomment %}
+        {% comment %} <th>Subject</th> {% endcomment %}
+        {% comment %} <th>Score</th> {% endcomment %}
+        {% comment %} <th>Total</th> {% endcomment %}
+    {% comment %} </tr> {% endcomment %}
+{% comment %}  {% endcomment %}
+    {% comment %} {% for a in attempts %} {% endcomment %}
+    {% comment %} <tr> {% endcomment %}
+        {% comment %} <td>{{ a.user.studentprofile.school_class.name }}</td> {% endcomment %}
+        {% comment %} <td>{{ a.user.username }}</td> {% endcomment %}
+        {% comment %} <td>{{ a.quiz.title }}</td> {% endcomment %}
+        {% comment %} <td>{{ a.score }}</td> {% endcomment %}
+        {% comment %} <td>{{ a.total_marks }}</td> {% endcomment %}
+    {% comment %} </tr> {% endcomment %}
+    {% comment %} {% empty %} {% endcomment %}
+    {% comment %} <tr> {% endcomment %}
+        {% comment %} <td colspan="5" align="center">No results found</td> {% endcomment %}
+    {% comment %} </tr> {% endcomment %}
+    {% comment %} {% endfor %} {% endcomment %}
+{% comment %} </table> {% endcomment %}
+{% comment %}  {% endcomment %}
+{% comment %} {% endblock %} {% endcomment %}
+{% comment %}  {% endcomment %}
+{% comment %}  {% endcomment %}
+{% comment %}  {% endcomment %}
+
+
+
+{% comment %} {% extends "base.html" %}
+{% block content %}
+
+<h2>Class Quiz Results</h2>
+
+<form method="get">
+    <label>Select Class:</label>
+    <select name="class" required>
+        <option value="">-- Select Class --</option>
+        {% for cls in classes %}
+            <option value="{{ cls.id }}"
+                {% if cls.id|stringformat:"s" == selected_class %}
+                    selected
+                {% endif %}
+            >
+                {{ cls.name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">View</button>
+
+    {% if selected_class %}
+        <a href="?class={{ selected_class }}&download=1"
+           style="padding:5px 10px;background:green;color:white;text-decoration:none;">
+           Download CSV
+        </a>
+
+        <button type="button" onclick="window.print()"
+           style="padding:5px 10px;background:blue;color:white;border:none;">
+           Print
+        </button>
+    {% endif %}
+</form>
+
+<hr>
+
+<table border="1" width="100%" cellpadding="5">
+    <tr>
+        <th>Class</th>
+        <th>Student</th>
+        <th>Quiz</th>
+        <th>Score</th>
+        <th>Total</th>
+    </tr>
+
+    {% for a in attempts %}
+    <tr>
+        <td>{{ a.user.studentprofile.school_class.name }}</td>
+        <td>{{ a.user.username }}</td>
+        <td>{{ a.quiz.title }}</td>
+        <td>{{ a.score }}</td>
+        <td>{{ a.total_marks }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5" align="center">No results found</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %} {% endcomment %}

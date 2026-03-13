@@ -1,0 +1,47 @@
+<h2>📊 Student Results by Class</h2>
+
+<form method="get">
+    <select name="class">
+        <option value="">-- Select Class --</option>
+        {% for c in classes %}
+            <option value="{{ c.id }}">{{ c.name }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="arm">
+        <option value="">-- Select Arm (Optional) --</option>
+        {% for a in arms %}
+            <option value="{{ a.id }}">{{ a.name }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">View Results</button>
+</form>
+
+<hr>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Student</th>
+        <th>Quiz</th>
+        <th>Class</th>
+        <th>Arm</th>
+        <th>Score</th>
+        <th>Date</th>
+    </tr>
+
+    {% for attempt in attempts %}
+    <tr>
+        <td>{{ attempt.user.username }}</td>
+        <td>{{ attempt.quiz.title }}</td>
+        <td>{{ attempt.school_class }}</td>
+        <td>{{ attempt.arm|default:"-" }}</td>
+        <td>{{ attempt.score }} / {{ attempt.total_marks }}</td>
+        <td>{{ attempt.taken_at }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="6">No results found.</td>
+    </tr>
+    {% endfor %}
+</table>

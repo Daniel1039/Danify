@@ -1,0 +1,9 @@
+{% extends 'admin/base_site.html' %}
+{% block content %}
+<h1>Import Questions CSV</h1>
+<form method='post' enctype='multipart/form-data'>{% csrf_token %}
+  <p><input type='file' name='csv_file' accept='.csv' required></p>
+  <button type='submit'>Upload</button>
+</form>
+<p>CSV headers: quiz, question_text, choice1..choice5, correct_choice (1-5), marks</p>
+{% endblock %}

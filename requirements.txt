@@ -1,6 +1,7 @@
 asgiref==3.11.0
 diff-match-patch==20241021
 Django==6.0
+<<<<<<< HEAD
 django-ckeditor==6.7.2
 django-environ==0.13.0
 django-import-export==4.3.14
@@ -16,6 +17,16 @@ pillow==12.0.0
 python-dateutil==2.9.0.post0
 python-decouple==3.8
 pytz==2020.1
+=======
+django-environ==0.13.0
+django-import-export==4.3.14
+et_xmlfile==2.0.0
+gunicorn==25.1.0
+openpyxl==3.1.5
+packaging==26.0
+pillow==12.0.0
+python-dateutil==2.9.0.post0
+>>>>>>> 89af4942bd44b3f025bec384189525980136c4db
 six==1.17.0
 sqlparse==0.5.4
 tablib==3.9.0

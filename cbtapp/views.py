@@ -22,7 +22,11 @@ from .models import Subscription, StudentProfile, Quiz, Attempt
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.conf import settings
+<<<<<<< HEAD
 
+=======
+from cbtapp.models import SomeModel  # replace with your model if needed
+>>>>>>> 89af4942bd44b3f025bec384189525980136c4db
 
 def home(request):
     return render(request, 'home.html')

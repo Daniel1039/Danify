@@ -1,450 +1,471 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Monthly Subscription</title>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
-  :root {
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
-    --primary-light: #eff6ff;
-    --accent: #f59e0b;
-    --accent-light: #fffbeb;
-    --surface: #ffffff;
-    --bg: #f0f4ff;
-    --text: #0f172a;
-    --muted: #64748b;
-    --border: #e2e8f0;
-    --success: #16a34a;
-    --success-light: #dcfce7;
-    --radius: 16px;
-    --shadow: 0 4px 24px rgba(37,99,235,0.09);
-    --shadow-lg: 0 12px 40px rgba(37,99,235,0.15);
-  }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+--primary:#2563eb;
+--primary-dark:#1d4ed8;
+--primary-light:#eff6ff;
+--accent:#f59e0b;
+--accent-light:#fffbeb;
+--surface:#ffffff;
+--bg:#f0f4ff;
+--text:#0f172a;
+--muted:#64748b;
+--border:#e2e8f0;
+--success:#16a34a;
+--success-light:#dcfce7;
+--radius:16px;
+--shadow:0 4px 24px rgba(37,99,235,0.09);
+}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 1rem;
-  }
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
 
-  .page-wrap {
-    width: 100%;
-    max-width: 480px;
-  }
+body{
+font-family:'DM Sans',sans-serif;
+background:var(--bg);
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:2rem 1rem;
+}
 
-  /* ── HEADER ──────────────────────────────── */
-  .page-header {
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
+.page-wrap{
+width:100%;
+max-width:480px;
+}
 
-  .page-header .icon-wrap {
-    width: 60px; height: 60px;
-    background: var(--primary);
-    border-radius: 16px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.7rem;
-    margin-bottom: 0.9rem;
-    box-shadow: 0 6px 20px rgba(37,99,235,0.25);
-  }
+.page-header{
+text-align:center;
+margin-bottom:1.5rem;
+}
 
-  .page-header h2 {
-    font-family: 'Sora', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--text);
-    margin-bottom: 5px;
-    letter-spacing: -0.5px;
-  }
+.icon-wrap{
+width:60px;
+height:60px;
+background:var(--primary);
+border-radius:16px;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+font-size:1.7rem;
+margin-bottom:0.9rem;
+box-shadow:0 6px 20px rgba(37,99,235,0.25);
+}
 
-  .page-header p {
-    color: var(--muted);
-    font-size: 0.88rem;
-  }
+.page-header h2{
+font-family:'Sora',sans-serif;
+font-size:1.5rem;
+font-weight:800;
+color:var(--text);
+margin-bottom:5px;
+}
 
-  /* ── AMOUNT BADGE ────────────────────────── */
-  .amount-badge {
-    background: linear-gradient(135deg, var(--accent) 0%, #f97316 100%);
-    color: white;
-    border-radius: 12px;
-    padding: 1rem 1.5rem;
-    text-align: center;
-    margin-bottom: 1.25rem;
-    box-shadow: 0 6px 20px rgba(245,158,11,0.3);
-  }
+.page-header p{
+color:var(--muted);
+font-size:0.9rem;
+}
 
-  .amount-badge .label {
-    font-size: 0.78rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    opacity: 0.85;
-    margin-bottom: 3px;
-  }
+.amount-badge{
+background:linear-gradient(135deg,var(--accent),#f97316);
+color:white;
+border-radius:12px;
+padding:1rem;
+text-align:center;
+margin-bottom:1.2rem;
+box-shadow:0 6px 20px rgba(245,158,11,0.3);
+}
 
-  .amount-badge .amount {
-    font-family: 'Sora', sans-serif;
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: -1px;
-  }
+.amount-badge .label{
+font-size:0.8rem;
+font-weight:600;
+text-transform:uppercase;
+opacity:0.85;
+}
 
-  /* ── CARD ────────────────────────────────── */
-  .card-box {
-    background: var(--surface);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    overflow: hidden;
-    margin-bottom: 1.25rem;
-  }
+.amount-badge .amount{
+font-family:'Sora',sans-serif;
+font-size:2rem;
+font-weight:800;
+}
 
-  .card-box-header {
-    background: var(--bg);
-    padding: 0.75rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+.card-box{
+background:var(--surface);
+border-radius:var(--radius);
+box-shadow:var(--shadow);
+border:1px solid var(--border);
+overflow:hidden;
+margin-bottom:1.2rem;
+}
 
-  .card-box-header span {
-    font-family: 'Sora', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-  }
+.card-box-header{
+background:var(--bg);
+padding:0.75rem 1.2rem;
+border-bottom:1px solid var(--border);
+display:flex;
+align-items:center;
+gap:8px;
+}
 
-  .card-box-body {
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-  }
+.card-box-header span{
+font-family:'Sora',sans-serif;
+font-size:0.8rem;
+font-weight:700;
+color:var(--muted);
+text-transform:uppercase;
+}
 
-  .bank-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
+.card-box-body{
+padding:1.2rem;
+display:flex;
+flex-direction:column;
+gap:0.9rem;
+}
 
-  .bank-row .key {
-    font-size: 0.8rem;
-    color: var(--muted);
-    font-weight: 500;
-    flex-shrink: 0;
-  }
+.bank-row{
+display:flex;
+justify-content:space-between;
+gap:1rem;
+flex-wrap:wrap;
+}
 
-  .bank-row .value {
-    font-size: 0.92rem;
-    font-weight: 600;
-    color: var(--text);
-    text-align: right;
-    word-break: break-word;
-  }
+.bank-row .key{
+font-size:0.85rem;
+color:var(--muted);
+}
 
-  .account-number-row {
-    background: var(--primary-light);
-    border: 1.5px dashed #bfdbfe;
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-  }
+.bank-row .value{
+font-size:0.9rem;
+font-weight:600;
+color:var(--text);
+word-break:break-word;
+max-width:60%;
+text-align:right;
+}
 
-  .account-number-row .acc-label {
-    font-size: 0.75rem;
-    color: var(--primary);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 2px;
-  }
+.account-number-row{
+background:var(--primary-light);
+border:1.5px dashed #bfdbfe;
+border-radius:10px;
+padding:0.8rem;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+flex-wrap:wrap;
+}
 
-  .account-number-row .acc-number {
-    font-family: 'Sora', sans-serif;
-    font-size: 1.35rem;
-    font-weight: 800;
-    color: var(--primary);
-    letter-spacing: 2px;
-  }
+.acc-label{
+font-size:0.75rem;
+color:var(--primary);
+font-weight:600;
+text-transform:uppercase;
+}
 
-  .copy-btn {
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
+.acc-number{
+font-family:'Sora',sans-serif;
+font-size:1.3rem;
+font-weight:800;
+color:var(--primary);
+letter-spacing:2px;
+}
 
-  .copy-btn:hover { background: var(--primary-dark); transform: scale(1.04); }
-  .copy-btn.copied { background: var(--success); }
+.copy-btn{
+background:var(--primary);
+color:white;
+border:none;
+border-radius:8px;
+padding:6px 12px;
+font-size:0.8rem;
+font-weight:600;
+cursor:pointer;
+}
 
-  /* ── DIVIDER ─────────────────────────────── */
-  .step-divider {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin: 0.25rem 0;
-    color: var(--muted);
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
+.copy-btn:hover{
+background:var(--primary-dark);
+}
 
-  .step-divider::before,
-  .step-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+.copy-btn.copied{
+background:var(--success);
+}
 
-  /* ── UPLOAD FORM ─────────────────────────── */
-  .upload-zone {
-    border: 2px dashed var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.18s, background 0.18s;
-    position: relative;
-    background: var(--bg);
-  }
+.step-divider{
+display:flex;
+align-items:center;
+gap:0.7rem;
+margin:10px 0;
+color:var(--muted);
+font-size:0.8rem;
+font-weight:600;
+}
 
-  .upload-zone:hover,
-  .upload-zone.dragover {
-    border-color: var(--primary);
-    background: var(--primary-light);
-  }
+.step-divider::before,
+.step-divider::after{
+content:'';
+flex:1;
+height:1px;
+background:var(--border);
+}
 
-  .upload-zone input[type="file"] {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-  }
+.upload-zone{
+border:2px dashed var(--border);
+border-radius:12px;
+padding:1.4rem;
+text-align:center;
+cursor:pointer;
+background:var(--bg);
+position:relative;
+}
 
-  .upload-zone .upload-icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    display: block;
-  }
+.upload-zone:hover{
+border-color:var(--primary);
+background:var(--primary-light);
+}
 
-  .upload-zone .upload-text {
-    font-size: 0.88rem;
-    color: var(--muted);
-    font-weight: 500;
-  }
+.upload-zone input{
+position:absolute;
+inset:0;
+opacity:0;
+cursor:pointer;
+}
 
-  .upload-zone .upload-text strong {
-    color: var(--primary);
-  }
+.upload-icon{
+font-size:2rem;
+margin-bottom:5px;
+}
 
-  .upload-zone .upload-hint {
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-top: 4px;
-    opacity: 0.7;
-  }
+.upload-text{
+font-size:0.9rem;
+color:var(--muted);
+}
 
-  .file-preview {
-    display: none;
-    align-items: center;
-    gap: 10px;
-    background: var(--success-light);
-    border: 1.5px solid #bbf7d0;
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    margin-top: 0.75rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--success);
-  }
+.upload-text strong{
+color:var(--primary);
+}
 
-  .file-preview.show { display: flex; }
+.upload-hint{
+font-size:0.75rem;
+color:var(--muted);
+}
 
-  /* ── SUBMIT BUTTON ───────────────────────── */
-  .submit-btn {
-    width: 100%;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 0.85rem;
-    font-size: 0.95rem;
-    font-weight: 700;
-    font-family: 'Sora', sans-serif;
-    cursor: pointer;
-    transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
-    box-shadow: 0 4px 14px rgba(37,99,235,0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 0.75rem;
-  }
+.file-preview{
+display:none;
+align-items:center;
+gap:10px;
+background:var(--success-light);
+border:1.5px solid #bbf7d0;
+border-radius:10px;
+padding:0.7rem;
+margin-top:10px;
+font-size:0.85rem;
+font-weight:600;
+color:var(--success);
+}
 
-  .submit-btn:hover {
-    background: var(--primary-dark);
-    box-shadow: 0 6px 20px rgba(37,99,235,0.35);
-    transform: translateY(-1px);
-  }
+.file-preview.show{
+display:flex;
+}
 
-  .submit-btn:active { transform: translateY(0); }
+.submit-btn{
+width:100%;
+background:var(--primary);
+color:white;
+border:none;
+border-radius:12px;
+padding:0.9rem;
+font-size:0.95rem;
+font-weight:700;
+font-family:'Sora',sans-serif;
+cursor:pointer;
+margin-top:10px;
+}
 
-  /* ── NOTE ────────────────────────────────── */
-  .note {
-    text-align: center;
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-top: 0.75rem;
-    line-height: 1.5;
-  }
+.submit-btn:hover{
+background:var(--primary-dark);
+}
 
-  /* ── RESPONSIVE ──────────────────────────── */
-  @media (max-width: 480px) {
-    body { padding: 1.25rem 0.85rem; align-items: flex-start; }
-    .amount-badge .amount { font-size: 1.65rem; }
-    .account-number-row .acc-number { font-size: 1.1rem; letter-spacing: 1px; }
-  }
+.note{
+text-align:center;
+font-size:0.8rem;
+color:var(--muted);
+margin-top:10px;
+}
+
+/* MOBILE */
+
+@media(max-width:480px){
+
+body{
+padding:1rem;
+align-items:flex-start;
+}
+
+.account-number-row{
+flex-direction:column;
+align-items:flex-start;
+}
+
+.copy-btn{
+width:100%;
+}
+
+.bank-row .value{
+max-width:100%;
+text-align:left;
+}
+
+}
+
 </style>
 </head>
+
 <body>
 
 <div class="page-wrap">
 
-  <!-- HEADER -->
-  <div class="page-header">
-    <div class="icon-wrap">💳</div>
-    <h2>Monthly Subscription</h2>
-    <p>Complete your payment using the details below</p>
-  </div>
+<div class="page-header">
+<div class="icon-wrap">💳</div>
+<h2>Monthly Subscription</h2>
+<p>Complete your payment using the details below</p>
+</div>
 
-  <!-- AMOUNT -->
-  <div class="amount-badge">
-    <div class="label">Amount to Pay</div>
-    <div class="amount">₦5,000</div>
-  </div>
+<div class="amount-badge">
+<div class="label">Amount to Pay</div>
+<div class="amount">₦5,000</div>
+</div>
 
-  <!-- BANK DETAILS CARD -->
-  <div class="card-box">
-    <div class="card-box-header">
-      <span>🏦</span>
-      <span>Bank Transfer Details</span>
-    </div>
-    <div class="card-box-body">
+<div class="card-box">
 
-      <div class="bank-row">
-        <span class="key">Bank</span>
-        <span class="value">OPAY</span>
-      </div>
+<div class="card-box-header">
+<span>🏦</span>
+<span>Bank Transfer Details</span>
+</div>
 
-      <div class="bank-row">
-        <span class="key">Account Name</span>
-        <span class="value">Daniel MAKANJUOLA OLADAPO</span>
-      </div>
+<div class="card-box-body">
 
-      <div class="account-number-row">
-        <div>
-          <div class="acc-label">Account Number</div>
-          <div class="acc-number" id="accNum">8109693714</div>
-        </div>
-        <button class="copy-btn" id="copyBtn" onclick="copyAccount()">Copy</button>
-      </div>
+<div class="bank-row">
+<span class="key">Bank</span>
+<span class="value">OPAY</span>
+</div>
 
-    </div>
-  </div>
+<div class="bank-row">
+<span class="key">Account Name</span>
+<span class="value">Daniel MAKANJUOLA OLADAPO</span>
+</div>
 
-  <!-- DIVIDER -->
-  <div class="step-divider">Then upload your receipt</div>
+<div class="account-number-row">
 
-  <!-- UPLOAD FORM CARD -->
-  <div class="card-box">
-    <div class="card-box-header">
-      <span>📤</span>
-      <span>Upload Payment Receipt</span>
-    </div>
-    <div class="card-box-body">
+<div>
+<div class="acc-label">Account Number</div>
+<div class="acc-number">8109693714</div>
+</div>
 
-      <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
+<button class="copy-btn" id="copyBtn" onclick="copyAccount()">Copy</button>
 
-        <div class="upload-zone" id="uploadZone">
-          <input type="file" name="receipt" required id="receiptInput" accept="image/*,.pdf"
-            onchange="handleFile(this)">
-          <span class="upload-icon">🖼️</span>
-          <div class="upload-text"><strong>Click to upload</strong> or drag & drop</div>
-          <div class="upload-hint">JPG, PNG, PDF accepted</div>
-        </div>
+</div>
 
-        <div class="file-preview" id="filePreview">
-          <span>✅</span>
-          <span id="fileName">receipt.jpg</span>
-        </div>
+</div>
+</div>
 
-        <button type="submit" class="submit-btn">
-          🚀 Submit Receipt
-        </button>
+<div class="step-divider">Then upload your receipt</div>
 
-      </form>
+<div class="card-box">
 
-      <p class="note">Your subscription will be activated within 24 hours after payment confirmation.</p>
+<div class="card-box-header">
+<span>📤</span>
+<span>Upload Payment Receipt</span>
+</div>
 
-    </div>
-  </div>
+<div class="card-box-body">
 
-</div><!-- /page-wrap -->
+<form method="POST" enctype="multipart/form-data">
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% csrf_token %}
+
+<div class="upload-zone">
+
+<input type="file" name="receipt" required id="receiptInput" accept="image/*,.pdf" onchange="handleFile(this)">
+
+<div class="upload-icon">🖼️</div>
+<div class="upload-text"><strong>Click to upload</strong> or drag & drop</div>
+<div class="upload-hint">JPG, PNG, PDF accepted</div>
+
+</div>
+
+<div class="file-preview" id="filePreview">
+<span>✅</span>
+<span id="fileName"></span>
+</div>
+
+<button type="submit" class="submit-btn">
+🚀 Submit Receipt
+</button>
+
+</form>
+
+<p class="note">
+Your subscription will be activated within 24 hours after payment confirmation.
+</p>
+
+</div>
+</div>
+
+</div>
+
 <script>
-  function copyAccount() {
-    navigator.clipboard.writeText('8109693714').then(() => {
-      const btn = document.getElementById('copyBtn');
-      btn.textContent = '✓ Copied!';
-      btn.classList.add('copied');
-      setTimeout(() => {
-        btn.textContent = 'Copy';
-        btn.classList.remove('copied');
-      }, 2000);
-    });
-  }
 
-  function handleFile(input) {
-    if (input.files && input.files[0]) {
-      const name = input.files[0].name;
-      document.getElementById('fileName').textContent = name;
-      document.getElementById('filePreview').classList.add('show');
-    }
-  }
+function copyAccount(){
 
-  // Drag & drop visual feedback
-  const zone = document.getElementById('uploadZone');
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
-  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); });
+navigator.clipboard.writeText("8109693714")
+
+.then(()=>{
+
+const btn=document.getElementById("copyBtn")
+
+btn.textContent="✓ Copied"
+
+btn.classList.add("copied")
+
+setTimeout(()=>{
+
+btn.textContent="Copy"
+
+btn.classList.remove("copied")
+
+},2000)
+
+})
+
+}
+
+function handleFile(input){
+
+if(input.files && input.files[0]){
+
+document.getElementById("fileName").textContent=input.files[0].name
+
+document.getElementById("filePreview").classList.add("show")
+
+}
+
+}
+
 </script>
+
 </body>
 </html>

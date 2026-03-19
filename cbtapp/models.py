@@ -1,5 +1,11 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
+import calendar
+
+
 
 User = get_user_model()
 
@@ -155,14 +161,17 @@ class Attempt(models.Model):
 # ============================
 # STUDENT PROFILE
 # ============================
+from django.utils import timezone
 
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
     school_class = models.ForeignKey(
         SchoolClass,
         on_delete=models.SET_NULL,
         null=True
     )
+
     arm = models.ForeignKey(
         ClassArm,
         on_delete=models.SET_NULL,
@@ -170,18 +179,19 @@ class StudentProfile(models.Model):
         blank=True
     )
 
+    # ✅ FREE TRIAL FIELDS
+    trial_start_time = models.DateTimeField(null=True, blank=True)
+    trial_used = models.BooleanField(default=False)  # IMPORTANT
+    trial_duration_minutes = models.IntegerField(default=9)
+
+    def trial_active(self):
+        if not self.trial_start_time:
+            return False
+        end_time = self.trial_start_time + timezone.timedelta(minutes=self.trial_duration_minutes)
+        return timezone.now() < end_time
+
     def __str__(self):
         return f"{self.user.username} ({self.school_class} {self.arm or ''})"
-
-
-# models.py
-
-from django.db import models
-from django.contrib.auth.models import User
-from django.utils import timezone
-from dateutil.relativedelta import relativedelta
-import calendar
-
 
 class Subscription(models.Model):
 
@@ -250,3 +260,63 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return self.name
+    
+    
+    
+# ---------------- Study Material ---------------
+class StudyMaterial(models.Model):
+    
+    subject = models.ForeignKey(
+        Subject,
+        on_delete=models.CASCADE
+    )
+
+    topic = models.CharField(max_length=200)
+
+    school_class = models.ForeignKey(
+        SchoolClass,
+        on_delete=models.CASCADE
+    )
+
+    arms = models.ManyToManyField(
+        ClassArm,
+        blank=True
+    )
+
+    pdf = models.FileField(
+        upload_to='study_materials/',
+        blank=True,
+        null=True
+    )
+
+    video_link = models.URLField(
+        blank=True,
+        null=True
+    )
+
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.subject.name} - {self.topic}"
+
+    def get_embed_video_url(self):
+        if not self.video_link:
+            return ""
+
+        url = self.video_link.strip()
+
+        # YOUTUBE
+        if "youtu.be/" in url:
+            video_id = url.split("youtu.be/")[1].split("?")[0]
+            return f"https://www.youtube.com/embed/{video_id}"
+
+        elif "watch?v=" in url:
+            video_id = url.split("watch?v=")[1].split("&")[0]
+            return f"https://www.youtube.com/embed/{video_id}"
+
+        # VIMEO
+        elif "vimeo.com/" in url:
+            video_id = url.split("vimeo.com/")[1].split("/")[0]
+            return f"https://player.vimeo.com/video/{video_id}"
+
+        return ""

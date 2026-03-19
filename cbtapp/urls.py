@@ -19,6 +19,7 @@ urlpatterns = [
     path('subscribe/', views.subscribe, name='subscribe'),  # ← THIS IS IMPORTANT
     path('register/', views.student_register, name='register'),
     path("contact/", views.contact, name="contact"),
+    path('view-pdf/<path:path>/', views.view_pdf, name='view_pdf'),
     
     
     

@@ -1,11 +1,12 @@
 from django.contrib import admin
-from .models import Subject, Quiz, Question, Attempt, SchoolClass, ClassArm, StudentProfile
 from django.urls import path
 from django.shortcuts import render, redirect
 from django.template.response import TemplateResponse
 import csv, io
 from django.contrib import admin
 from .models import ContactMessage
+from .models import Subject, Quiz, Question, Attempt, SchoolClass, ClassArm, StudentProfile, StudyMaterial
+
 
 # ---------------- Subject ----------------
 @admin.register(Subject)
@@ -201,3 +202,27 @@ class ContactMessageAdmin(admin.ModelAdmin):
     search_fields = ("name", "email", "subject")
     list_filter = ("created",)
     readonly_fields = ("name", "email", "subject", "message", "created")
+    
+# ---------------- Study Material Admin ----------------
+
+@admin.register(StudyMaterial)
+class StudyMaterialAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'subject',
+        'topic',
+        'school_class',
+        'uploaded_at'
+    )
+
+    list_filter = (
+        'subject',
+        'school_class'
+    )
+
+    filter_horizontal = ('arms',)
+
+    search_fields = (
+        'topic',
+        'subject__name'
+    )

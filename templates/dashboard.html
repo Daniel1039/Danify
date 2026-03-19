@@ -1,493 +1,918 @@
-
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DAPortal — Student Dashboard</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DAPortal — Student Dashboard</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
 
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}" 
-</head>
-<body>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
+  </head>
+  <body>
+    <!-- SIDEBAR OVERLAY -->
+    <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 
-<!-- SIDEBAR OVERLAY -->
-<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+    <div class="shell">
+      <!-- ══════════ SIDEBAR ══════════ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">📚</div>
+          <div class="logo-text">DA<span>Portal</span></div>
+        </div>
 
-<div class="shell">
+        <nav class="sidebar-nav">
+          <div class="nav-label">Main</div>
 
-  <!-- ══════════ SIDEBAR ══════════ -->
-  <aside class="sidebar" id="sidebar">
+          <button class="nav-item active" onclick="showPage('dashboard', this)">
+            <div class="nav-icon">🏠</div>
+            Dashboard
+          </button>
 
-    <div class="sidebar-logo">
-      <div class="logo-icon">📚</div>
-      <div class="logo-text">DA<span>Portal</span></div>
-    </div>
+          <button class="nav-item" onclick="showPage('exams', this)">
+            <div class="nav-icon">📝</div>
+            Exams
+          </button>
 
-    <nav class="sidebar-nav">
-      <div class="nav-label">Main</div>
+          <button class="nav-item" onclick="showPage('results', this)">
+            <div class="nav-icon">📊</div>
+            Results
+          </button>
+          <button class="nav-item" onclick="showPage('materials', this)">
+            <div class="nav-icon">📚</div>
+            Study Materials
+          </button>
+          <div class="nav-label">Account</div>
 
-      <button class="nav-item active" onclick="showPage('dashboard', this)">
-        <div class="nav-icon">🏠</div>
-        Dashboard
-      </button>
+          <button class="nav-item" onclick="showPage('payment', this)">
+            <div class="nav-icon">💳</div>
+            Payment
+          </button>
 
-      <button class="nav-item" onclick="showPage('exams', this)">
-        <div class="nav-icon">📝</div>
-        Exams
-      </button>
+          <button class="nav-item" onclick="showPage('profile', this)">
+            <div class="nav-icon">👤</div>
+            My Profile
+          </button>
 
-      <button class="nav-item" onclick="showPage('results', this)">
-        <div class="nav-icon">📊</div>
-        Results
-      </button>
+          <div class="nav-label">Support</div>
 
-      <div class="nav-label">Account</div>
+          <button class="nav-item">
+            <div class="nav-icon">❓</div>
+            Help & FAQ
+          </button>
+        </nav>
 
-      <button class="nav-item" onclick="showPage('payment', this)">
-        <div class="nav-icon">💳</div>
-        Payment
-      </button>
+        <div class="sidebar-user">
+          <div class="user-avatar-lg">{{ user.username|slice:":1"|upper }}</div>
+          <div class="user-info-sm">
+            <div class="user-name-sm">{{ user.username }}</div>
+            <div class="user-role-sm">Student</div>
+          </div>
+          <a href="{% url 'logout' %}" class="logout-btn" title="Logout">⎋</a>
+        </div>
+      </aside>
 
-      <button class="nav-item" onclick="showPage('profile', this)">
-        <div class="nav-icon">👤</div>
-        My Profile
-      </button>
+      <!-- ══════════ MAIN ══════════ -->
+      <div class="main">
+        <!-- TOP BAR -->
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            <div class="page-title" id="pageTitle">Dashboard</div>
+          </div>
+          <div class="topbar-right">
+            <span class="topbar-name">{{ user.username }}</span>
+            <div class="topbar-avatar">
+              {{ user.username|slice:":1"|upper }}
+            </div>
+          </div>
+        </header>
 
-      <div class="nav-label">Support</div>
-
-      <button class="nav-item">
-        <div class="nav-icon">❓</div>
-        Help & FAQ
-      </button>
-
-    </nav>
-
-    <div class="sidebar-user">
-      <div class="user-avatar-lg">{{ user.username|slice:":1"|upper }}</div>
-      <div class="user-info-sm">
-        <div class="user-name-sm">{{ user.username }}</div>
-        <div class="user-role-sm">Student</div>
-      </div>
-      <a href="{% url 'logout' %}" class="logout-btn" title="Logout">⎋</a>
-    </div>
-
-  </aside>
-
-  <!-- ══════════ MAIN ══════════ -->
-  <div class="main">
-
-    <!-- TOP BAR -->
-    <header class="topbar">
-      <div class="topbar-left">
-        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-        <div class="page-title" id="pageTitle">Dashboard</div>
-      </div>
-      <div class="topbar-right">
-        <span class="topbar-name">{{ user.username }}</span>
-        <div class="topbar-avatar">{{ user.username|slice:":1"|upper }}</div>
-      </div>
-    </header>
-
-    <!-- PAGE CONTENT -->
-    <div class="page-content">
-
-      <!-- ══════════════════════════════
+        <!-- PAGE CONTENT -->
+        <div class="page-content">
+          <!-- ══════════════════════════════
            PAGE: DASHBOARD
       ══════════════════════════════ -->
-      <div class="page active" id="page-dashboard">
-
-        <!-- Welcome Banner -->
-        <div class="welcome-banner">
-          <div>
-            <div class="welcome-title">Welcome back, {{ user.username }}! 👋</div>
-            <p class="welcome-sub">You have exams available. Keep up the great work!</p>
-          </div>
-          <div class="welcome-emoji">🎓</div>
-        </div>
-
-        <!-- Stats Row -->
-        <div class="stats-row">
-          <div class="stat-card">
-            <div class="stat-icon blue">📝</div>
-            <div>
-              <div class="stat-val">{{ quizzes|length }}</div>
-              <div class="stat-lbl">Subjects</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon green">✅</div>
-            <div>
-              <div class="stat-val">{{ attempts|length }}</div>
-              <div class="stat-lbl">Attempts</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon amber">⏳</div>
-            <div>
-              <div class="stat-val">{{ days_left }}</div>
-              <div class="stat-lbl">Days Left</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon indigo">🏆</div>
-            <div>
-              <div class="stat-val">–</div>
-              <div class="stat-lbl">Best Score</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Subscription Status -->
-        <div class="status-card {% if days_left <= 2 %}s-danger{% elif days_left <= 5 %}s-warn{% else %}s-active{% endif %}">
-          <div class="s-info">
-            <div class="s-ico">{% if days_left <= 2 %}⚠️{% elif days_left <= 5 %}🕐{% else %}✅{% endif %}</div>
-            <div>
-              <div class="s-label">
-                {% if days_left <= 2 %}Subscription Expiring Urgently
-                {% elif days_left <= 5 %}Subscription Expiring Soon
-                {% else %}Subscription Active{% endif %}
+          <div class="page active" id="page-dashboard">
+            <!-- Welcome Banner -->
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+              <div>
+                <div class="welcome-title">
+                  Welcome back, {{ user.username }}! 👋
+                </div>
+                <p class="welcome-sub">
+                  You have exams available. Keep up the great work!
+                </p>
               </div>
-              <div class="s-meta">
-                <span>📅 Expires: <strong>{{ subscription.end_date|date:"F j, Y" }}</strong></span>
-                <span>⏳ <strong>{{ days_left }} days</strong> remaining</span>
+              <div class="welcome-emoji">🎓</div>
+            </div>
+            <!-- Free Trial Countdown -->
+            {% if trial_active %}
+            <p style="margin-top: 10px; font-weight: 500; color: #dc2626">
+              Your free trial ends in: <span id="countdown"></span>
+              to continute click on payment and subscribe 
+            </p>
+            <script>
+              let endTime = new Date(
+                "{{ trial_end_time|date:'Y-m-d H:i:s' }}",
+              ).getTime();
+              let timer = setInterval(function () {
+                let now = new Date().getTime();
+                let distance = endTime - now;
+                if (distance < 0) {
+                  clearInterval(timer);
+                  window.location.href = "{% url 'subscribe' %}";
+                } else {
+                  let minutes = Math.floor(
+                    (distance % (1000 * 60 * 60)) / (1000 * 60),
+                  );
+                  let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                  document.getElementById("countdown").innerHTML =
+                    minutes + "m " + seconds + "s";
+                }
+              }, 1000);
+            </script>
+            {% endif %}
+            <!-- Stats Row -->
+            <div class="stats-row">
+              <div class="stat-card">
+                <div class="stat-icon blue">📝</div>
+                <div>
+                  <div class="stat-val">{{ quizzes|length }}</div>
+                  <div class="stat-lbl">Subjects</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon green">✅</div>
+                <div>
+                  <div class="stat-val">{{ attempts|length }}</div>
+                  <div class="stat-lbl">Attempts</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon amber">⏳</div>
+                <div>
+                  <div class="stat-val">{{ days_left }}</div>
+                  <div class="stat-lbl">Days Left</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon indigo">🏆</div>
+                <div>
+                  <div class="stat-val">–</div>
+                  <div class="stat-lbl">Best Score</div>
+                </div>
               </div>
             </div>
+
+            <!-- Subscription Status -->
+            <div
+              class="status-card {% if days_left <= 2 %}s-danger{% elif days_left <= 5 %}s-warn{% else %}s-active{% endif %}"
+            >
+              <div class="s-info">
+                <div class="s-ico">
+                  {% if days_left <= 2 %}⚠️{% elif days_left <= 5 %}🕐{% else
+                  %}✅{% endif %}
+                </div>
+                <div>
+                  <div class="s-label">
+                    {% if days_left <= 2 %}Subscription Expiring Urgently {%
+                    elif days_left <= 5 %}Subscription Expiring Soon {% else
+                    %}Subscription Active{% endif %}
+                  </div>
+                  <div class="s-meta">
+                    <span
+                      >📅 Expires:
+                      <strong
+                        >{{ subscription.end_date|date:"F j, Y" }}</strong
+                      ></span
+                    >
+                    <span
+                      >⏳ <strong>{{ days_left }} days</strong> remaining</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  flex-wrap: wrap;
+                "
+              >
+                <div class="s-badge">
+                  {% if days_left <= 2 %}🚨 Renew Now{% elif days_left <= 5 %}⚠
+                  Renew Soon{% else %}✔ Active{% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Results -->
+            {% comment %}
+            <div class="card-box">
+              {% endcomment %} {% comment %}
+              <div class="card-header-row">
+                {% endcomment %} {% comment %}
+                <h3 class="card-title">📊 Recent Results</h3>
+                {% endcomment %} {% comment %}
+                <button
+                  class="btn-outline"
+                  onclick="
+                    showPage(
+                      'results',
+                      document.querySelectorAll('.nav-item')[2],
+                    )
+                  "
+                >
+                  View All
+                </button>
+                {% endcomment %} {% comment %}
+              </div>
+              {% endcomment %} {% comment %}
+              <div class="table-responsive">
+                {% endcomment %} {% comment %}
+                <table class="results-table">
+                  {% endcomment %} {% comment %}
+                  <thead>
+                    <tr>
+                      <th>Quiz</th>
+                      <th>Score</th>
+                      <th>Total</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  {% endcomment %} {% comment %}
+                  <tbody>
+                    {% endcomment %} {% comment %} {% for a in
+                    attempts|slice:":3" %} {% endcomment %} {% comment %}
+                    <tr>
+                      {% endcomment %} {% comment %}
+                      <td><strong>{{ a.quiz.title }}</strong></td>
+                      {% endcomment %} {% comment %}
+                      <td><span class="score-pill">{{ a.score }}</span></td>
+                      {% endcomment %} {% comment %}
+                      <td>{{ a.total_marks }}</td>
+                      {% endcomment %} {% comment %}
+                      <td>{{ a.taken_at|date:"d M Y" }}</td>
+                      {% endcomment %} {% comment %}
+                    </tr>
+                    {% endcomment %} {% comment %} {% empty %} {% endcomment %}
+                    {% comment %}
+                    <tr>
+                      <td colspan="4">
+                        <div class="empty-state">
+                          <span class="ei">📭</span>No attempts yet.
+                        </div>
+                      </td>
+                    </tr>
+                    {% endcomment %} {% comment %} {% endfor %} {% endcomment %}
+                    {% comment %}
+                  </tbody>
+                  {% endcomment %} {% comment %}
+                </table>
+                {% endcomment %} {% comment %}
+              </div>
+              {% endcomment %} {% comment %}
+            </div>
+            {% endcomment %}
           </div>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <div class="s-badge">{% if days_left <= 2 %}🚨 Renew Now{% elif days_left <= 5 %}⚠ Renew Soon{% else %}✔ Active{% endif %}</div>
-            {% comment %} <button class="btn-outline" onclick="showPage('payment', document.querySelector('[onclick*=payment]'))"> {% endcomment %}
-              {% comment %} 💳 {% if days_left <= 5 %}Renew{% else %}Pay Next Month{% endif %} {% endcomment %}
-            {% comment %} </button> {% endcomment %}
-          </div>
-        </div>
+          <!-- /dashboard -->
 
-
-
-        <!-- Recent Results -->
-        {% comment %} <div class="card-box"> {% endcomment %}
-          {% comment %} <div class="card-header-row"> {% endcomment %}
-            {% comment %} <h3 class="card-title">📊 Recent Results</h3> {% endcomment %}
-            {% comment %} <button class="btn-outline" onclick="showPage('results', document.querySelectorAll('.nav-item')[2])">View All</button> {% endcomment %}
-          {% comment %} </div> {% endcomment %}
-          {% comment %} <div class="table-responsive"> {% endcomment %}
-            {% comment %} <table class="results-table"> {% endcomment %}
-              {% comment %} <thead><tr><th>Quiz</th><th>Score</th><th>Total</th><th>Date</th></tr></thead> {% endcomment %}
-              {% comment %} <tbody> {% endcomment %}
-                {% comment %} {% for a in attempts|slice:":3" %} {% endcomment %}
-                {% comment %} <tr> {% endcomment %}
-                  {% comment %} <td><strong>{{ a.quiz.title }}</strong></td> {% endcomment %}
-                  {% comment %} <td><span class="score-pill">{{ a.score }}</span></td> {% endcomment %}
-                  {% comment %} <td>{{ a.total_marks }}</td> {% endcomment %}
-                  {% comment %} <td>{{ a.taken_at|date:"d M Y" }}</td> {% endcomment %}
-                {% comment %} </tr> {% endcomment %}
-                {% comment %} {% empty %} {% endcomment %}
-                {% comment %} <tr><td colspan="4"><div class="empty-state"><span class="ei">📭</span>No attempts yet.</div></td></tr> {% endcomment %}
-                {% comment %} {% endfor %} {% endcomment %}
-              {% comment %} </tbody> {% endcomment %}
-            {% comment %} </table> {% endcomment %}
-          {% comment %} </div> {% endcomment %}
-        {% comment %} </div> {% endcomment %}
-
-
-      </div><!-- /dashboard -->
-
-      <!-- ══════════════════════════════
+          <!-- ══════════════════════════════
            PAGE: EXAMS
       ══════════════════════════════ -->
-      <div class="page" id="page-exams">
-
-        <div class="card-box">
-          <div class="card-header-row">
-            <h3 class="card-title">📝 Select Your Subjects</h3>
-            <button type="button" class="btn-outline" data-bs-toggle="modal" data-bs-target="#resultModal">
-              📊 View Results
-            </button>
-          </div>
-
-          <form method="POST" action="{% url 'start_exam' %}">
-            {% csrf_token %}
-            <div class="subject-grid">
-              {% for quiz in quizzes %}
-              <div class="subject-item">
-                <input type="checkbox" name="subjects" value="{{ quiz.id }}" id="quiz_{{ quiz.id }}">
-                <label class="subject-label" for="quiz_{{ quiz.id }}">
-                  <span class="chk">✓</span>
-                  {{ quiz.title }}
-                </label>
+          <div class="page" id="page-exams">
+            <div class="card-box">
+              <div class="card-header-row">
+                <h3 class="card-title">📝 Select Your Subjects</h3>
+                <button
+                  type="button"
+                  class="btn-outline"
+                  data-bs-toggle="modal"
+                  data-bs-target="#resultModal"
+                >
+                  📊 View Results
+                </button>
               </div>
-              {% endfor %}
+
+              <form method="POST" action="{% url 'start_exam' %}">
+                {% csrf_token %}
+                <div class="subject-grid">
+                  {% for quiz in quizzes %}
+                  <div class="subject-item">
+                    <input
+                      type="checkbox"
+                      name="subjects"
+                      value="{{ quiz.id }}"
+                      id="quiz_{{ quiz.id }}"
+                    />
+                    <label class="subject-label" for="quiz_{{ quiz.id }}">
+                      <span class="chk">✓</span>
+                      {{ quiz.title }}
+                    </label>
+                  </div>
+                  {% endfor %}
+                </div>
+                <button type="submit" class="btn-primary">🚀 Start Exam</button>
+              </form>
             </div>
-            <button type="submit" class="btn-primary">🚀 Start Exam</button>
-          </form>
-        </div>
+          </div>
+          <!-- /exams -->
 
-      </div><!-- /exams -->
-
-      <!-- ══════════════════════════════
+          <!-- ══════════════════════════════
            PAGE: RESULTS
       ══════════════════════════════ -->
-      <div class="page" id="page-results">
+          <div class="page" id="page-results">
+            <div class="card-box">
+              <div class="card-header-row">
+                <h3 class="card-title">📊 All Examination Results</h3>
+              </div>
+              <div class="table-responsive">
+                <table class="results-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Quiz</th>
+                      <th>Score</th>
+                      <th>Total</th>
+                      <th>Date & Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for a in attempts %}
+                    <tr>
+                      <td data-label="#">
+                        <span style="color: var(--muted)"
+                          >{{ forloop.counter }}</span
+                        >
+                      </td>
 
-        <div class="card-box">
-          <div class="card-header-row">
-            <h3 class="card-title">📊 All Examination Results</h3>
-          </div>
-          <div class="table-responsive">
-            <table class="results-table">
-              <thead><tr><th>#</th><th>Quiz</th><th>Score</th><th>Total</th><th>Date & Time</th></tr></thead>
-              <tbody>
-                {% for a in attempts %}
-                <tr>
-                  <td style="color:var(--muted);">{{ forloop.counter }}</td>
-                  <td><strong>{{ a.quiz.title }}</strong></td>
-                  <td><span class="score-pill">{{ a.score }}</span></td>
-                  <td>{{ a.total_marks }}</td>
-                  <td>{{ a.taken_at|date:"d M Y, H:i" }}</td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="5"><div class="empty-state"><span class="ei">📭</span>No exam attempts yet. Head to Exams to begin!</div></td></tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                      <td data-label="Quiz">
+                        <strong>{{ a.quiz.title }}</strong>
+                      </td>
 
-      </div><!-- /results -->
+                      <td data-label="Score">
+                        <span class="score-pill">{{ a.score }}</span>
+                      </td>
 
-      <!-- ══════════════════════════════
-           PAGE: PAYMENT
-      ══════════════════════════════ -->
-      <div class="page" id="page-payment">
+                      <td data-label="Total">{{ a.total_marks }}</td>
 
-        <!-- Current Status -->
-        <div class="status-card {% if days_left <= 2 %}s-danger{% elif days_left <= 5 %}s-warn{% else %}s-active{% endif %}" style="margin-bottom:1.5rem;">
-          <div class="s-info">
-            <div class="s-ico">💳</div>
-            <div>
-              <div class="s-label">Current Subscription</div>
-              <div class="s-meta">
-                <span>Expires: <strong>{{ subscription.end_date|date:"F j, Y" }}</strong></span>
-                <span><strong>{{ days_left }} days</strong> remaining</span>
+                      <td data-label="Date & Time">
+                        {{ a.taken_at|date:"d M Y, H:i" }}
+                      </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                      <td colspan="5">
+                        <div class="empty-state">
+                          <span class="ei">📭</span>
+                          No exam attempts yet. Head to Exams to begin!
+                        </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
-          <div class="s-badge">{% if days_left <= 2 %}🚨 Expired Soon{% elif days_left <= 5 %}⚠ Renew Soon{% else %}✔ Active{% endif %}</div>
-        </div>
+          <!-- /results -->
+          <!-- ══════════════════════════════
+   
+══════════════════════════════ 
+     PAGE: STUDY MATERIALS
+══════════════════════════════ -->
+          <div class="page" id="page-materials">
+            <div class="card-box">
+              <div class="card-header-row">
+                <h3 class="card-title">📚 Study Materials</h3>
+              </div>
 
+              {% regroup materials by subject as subject_list %}
 
-        <!-- Plan Selection -->
-        {% comment %} <div class="card-box"> {% endcomment %}
-          {% comment %} <div class="card-header-row"> {% endcomment %}
-            {% comment %} <h3 class="card-title">🎯 Choose a Plan</h3> {% endcomment %}
-          {% comment %} </div> {% endcomment %}
-          {% comment %} <div class="plan-grid"> {% endcomment %}
-            {% comment %} <div class="plan-card" onclick="selectPlan(this)"> {% endcomment %}
-              {% comment %} <div class="plan-name">Monthly</div> {% endcomment %}
-              {% comment %} <div class="plan-price">₦2,500 <span>/ month</span></div> {% endcomment %}
-              {% comment %} <div class="plan-desc">Full access to all subjects & exams for 30 days.</div> {% endcomment %}
-            {% comment %} </div> {% endcomment %}
-            {% comment %} <div class="plan-card selected" onclick="selectPlan(this)"> {% endcomment %}
-              {% comment %} <div class="plan-badge">⭐ Popular</div> {% endcomment %}
-              {% comment %} <div class="plan-name">Quarterly</div> {% endcomment %}
-              {% comment %} <div class="plan-price">₦6,500 <span>/ 3 months</span></div> {% endcomment %}
-              {% comment %} <div class="plan-desc">Save 13% compared to monthly billing.</div> {% endcomment %}
-            {% comment %} </div> {% endcomment %}
-            {% comment %} <div class="plan-card" onclick="selectPlan(this)"> {% endcomment %}
-              {% comment %} <div class="plan-name">Annual</div> {% endcomment %}
-              {% comment %} <div class="plan-price">₦22,000 <span>/ year</span></div> {% endcomment %}
-              {% comment %} <div class="plan-desc">Best value. Save 27% with yearly billing.</div> {% endcomment %}
-            {% comment %} </div> {% endcomment %}
-          {% comment %} </div> {% endcomment %}
-        {% comment %} </div> {% endcomment %}
+              <div class="accordion" id="materialsAccordion">
+                {% for subject in subject_list %}
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#subject{{ forloop.counter }}"
+                    >
+                      📘 {{ subject.grouper.name }}
+                    </button>
+                  </h2>
 
+                  <div
+                    id="subject{{ forloop.counter }}"
+                    class="accordion-collapse collapse"
+                    data-bs-parent="#materialsAccordion"
+                  >
+                    <div class="accordion-body">
+                      <!-- ✅ RESPONSIVE TABLE -->
+                      <div class="materials-list">
+                        {% for material in subject.list %}
+                        <div class="material-card">
+                          <div class="material-top">
+                            <div class="material-title">
+                              📘 {{ material.topic }}
+                            </div>
+                          </div>
 
-        <!-- Payment Form -->
-        <a href="{% url 'subscribe' %}" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:0.75rem 1.5rem; background:#16a34a; color:white; font-size:0.92rem; font-weight:700; border-radius:10px; text-decoration:none; box-shadow:0 2px 10px rgba(22,163,74,0.25); transition:background 0.18s;">
-         🚀 Proceed to Payment &amp; Activate
-        </a>
+                          <div class="material-actions">
+                            {% if material.pdf %}
+                            <button
+                              onclick="previewPDF('/view-pdf/{{ material.pdf.name }}')"
+                              class="btn btn-outline-primary btn-sm"
+                            >
+                              📄 Preview PDF
+                            </button>
+                            {% endif %} {% if material.video_link %}
+                            <button
+                              onclick="previewVideo('{{ material.get_embed_video_url|escapejs }}')"
+                              class="btn btn-outline-secondary btn-sm"
+                            >
+                              ▶ Watch Video
+                            </button>
+                            {% endif %}
+                          </div>
+                        </div>
+                        {% endfor %}
+                      </div>
+                      <!-- /responsive table -->
+                    </div>
+                  </div>
+                </div>
 
+                {% empty %}
+                <div class="empty-state">
+                  <span class="ei">📭</span>
+                  No study materials available yet.
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
 
-        <!-- Payment History -->
-        {% comment %} <div class="card-box"> {% endcomment %}
-          {% comment %} <div class="card-header-row"> {% endcomment %}
-            {% comment %} <h3 class="card-title">🧾 Payment History</h3> {% endcomment %}
-          {% comment %} </div> {% endcomment %}
-          {% comment %} <div class="pay-row"> {% endcomment %}
-            {% comment %} <div class="pay-method"> {% endcomment %}
-              {% comment %} <div class="pay-icon">💳</div> {% endcomment %}
-              {% comment %} <div> {% endcomment %}
-                {% comment %} <div class="pay-name">Quarterly Plan</div> {% endcomment %}
-                {% comment %} <div class="pay-date">{{ subscription.end_date|date:"d M Y" }}</div> {% endcomment %}
-              {% comment %} </div> {% endcomment %}
-            {% comment %} </div> {% endcomment %}
-            {% comment %} <div style="display:flex;align-items:center;gap:12px;"> {% endcomment %}
-              {% comment %} <div class="pay-amount">₦6,500</div> {% endcomment %}
-              {% comment %} <div class="pay-status paid">Paid</div> {% endcomment %}
-            {% comment %} </div> {% endcomment %}
-          {% comment %} </div> {% endcomment %}
-          {% comment %} <div class="pay-row"> {% endcomment %}
-            {% comment %} <div class="pay-method"> {% endcomment %}
-              {% comment %} <div class="pay-icon">💳</div> {% endcomment %}
-              {% comment %} <div> {% endcomment %}
-                {% comment %} <div class="pay-name">Monthly Plan</div> {% endcomment %}
-                {% comment %} <div class="pay-date">Previous period</div> {% endcomment %}
-              {% comment %} </div> {% endcomment %}
-            {% comment %} </div> {% endcomment %}
-            {% comment %} <div style="display:flex;align-items:center;gap:12px;"> {% endcomment %}
-              {% comment %} <div class="pay-amount">₦2,500</div> {% endcomment %}
-              {% comment %} <div class="pay-status paid">Paid</div> {% endcomment %}
-            {% comment %} </div> {% endcomment %}
-          {% comment %} </div> {% endcomment %}
-        {% comment %} </div> {% endcomment %}
+          <!-- PDF Preview Modal -->
+          <div class="modal fade" id="pdfModal" tabindex="-1">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">📄 PDF Preview</h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                  ></button>
+                </div>
+                <div class="modal-body" style="height: 80vh">
+                  <iframe
+                    id="pdfFrame"
+                    src=""
+                    width="100%"
+                    height="100%"
+                    style="border: none"
+                  ></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
 
+          <!-- VIDEO MODAL -->
+          <div class="modal fade" id="videoModal" tabindex="-1">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">🎥 Video Lesson</h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                  ></button>
+                </div>
+                <div class="modal-body" style="height: 80vh">
+                  <iframe
+                    id="videoFrame"
+                    width="100%"
+                    height="100%"
+                    frameborder="0"
+                    allow="
+                      accelerometer;
+                      autoplay;
+                      clipboard-write;
+                      encrypted-media;
+                      gyroscope;
+                      picture-in-picture;
+                    "
+                    allowfullscreen
+                  ></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      </div>    <!-- /payment -->
+          <!-- ══════════════════════════════
+           PAGE: PAYMENT
+      ══════════════════════════════ -->
+          <div class="page" id="page-payment">
+            <!-- Current Status -->
+            <div
+              class="status-card {% if days_left <= 2 %}s-danger{% elif days_left <= 5 %}s-warn{% else %}s-active{% endif %}"
+              style="margin-bottom: 1.5rem"
+            >
+              <div class="s-info">
+                <div class="s-ico">💳</div>
+                <div>
+                  <div class="s-label">Current Subscription</div>
+                  <div class="s-meta">
+                    <span
+                      >Expires:
+                      <strong
+                        >{{ subscription.end_date|date:"F j, Y" }}</strong
+                      ></span
+                    >
+                    <span><strong>{{ days_left }} days</strong> remaining</span>
+                  </div>
+                </div>
+              </div>
+              <div class="s-badge">
+                {% if days_left <= 2 %}🚨 Expired Soon{% elif days_left <= 5 %}⚠
+                Renew Soon{% else %}✔ Active{% endif %}
+              </div>
+            </div>
 
-      <!-- ══════════════════════════════
+            <!-- Plan Selection -->
+            {% comment %}
+            <div class="card-box">
+              {% endcomment %} {% comment %}
+              <div class="card-header-row">
+                {% endcomment %} {% comment %}
+                <h3 class="card-title">🎯 Choose a Plan</h3>
+                {% endcomment %} {% comment %}
+              </div>
+              {% endcomment %} {% comment %}
+              <div class="plan-grid">
+                {% endcomment %} {% comment %}
+                <div class="plan-card" onclick="selectPlan(this)">
+                  {% endcomment %} {% comment %}
+                  <div class="plan-name">Monthly</div>
+                  {% endcomment %} {% comment %}
+                  <div class="plan-price">₦2,500 <span>/ month</span></div>
+                  {% endcomment %} {% comment %}
+                  <div class="plan-desc">
+                    Full access to all subjects & exams for 30 days.
+                  </div>
+                  {% endcomment %} {% comment %}
+                </div>
+                {% endcomment %} {% comment %}
+                <div class="plan-card selected" onclick="selectPlan(this)">
+                  {% endcomment %} {% comment %}
+                  <div class="plan-badge">⭐ Popular</div>
+                  {% endcomment %} {% comment %}
+                  <div class="plan-name">Quarterly</div>
+                  {% endcomment %} {% comment %}
+                  <div class="plan-price">₦6,500 <span>/ 3 months</span></div>
+                  {% endcomment %} {% comment %}
+                  <div class="plan-desc">
+                    Save 13% compared to monthly billing.
+                  </div>
+                  {% endcomment %} {% comment %}
+                </div>
+                {% endcomment %} {% comment %}
+                <div class="plan-card" onclick="selectPlan(this)">
+                  {% endcomment %} {% comment %}
+                  <div class="plan-name">Annual</div>
+                  {% endcomment %} {% comment %}
+                  <div class="plan-price">₦22,000 <span>/ year</span></div>
+                  {% endcomment %} {% comment %}
+                  <div class="plan-desc">
+                    Best value. Save 27% with yearly billing.
+                  </div>
+                  {% endcomment %} {% comment %}
+                </div>
+                {% endcomment %} {% comment %}
+              </div>
+              {% endcomment %} {% comment %}
+            </div>
+            {% endcomment %}
+
+            <!-- Payment Form -->
+            <a
+              href="{% url 'subscribe' %}"
+              style="
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                width: 100%;
+                padding: 0.75rem 1.5rem;
+                background: #16a34a;
+                color: white;
+                font-size: 0.92rem;
+                font-weight: 700;
+                border-radius: 10px;
+                text-decoration: none;
+                box-shadow: 0 2px 10px rgba(22, 163, 74, 0.25);
+                transition: background 0.18s;
+              "
+            >
+              🚀 Proceed to Payment &amp; Activate
+            </a>
+
+            <!-- Payment History -->
+            {% comment %}
+            <div class="card-box">
+              {% endcomment %} {% comment %}
+              <div class="card-header-row">
+                {% endcomment %} {% comment %}
+                <h3 class="card-title">🧾 Payment History</h3>
+                {% endcomment %} {% comment %}
+              </div>
+              {% endcomment %} {% comment %}
+              <div class="pay-row">
+                {% endcomment %} {% comment %}
+                <div class="pay-method">
+                  {% endcomment %} {% comment %}
+                  <div class="pay-icon">💳</div>
+                  {% endcomment %} {% comment %}
+                  <div>
+                    {% endcomment %} {% comment %}
+                    <div class="pay-name">Quarterly Plan</div>
+                    {% endcomment %} {% comment %}
+                    <div class="pay-date">
+                      {{ subscription.end_date|date:"d M Y" }}
+                    </div>
+                    {% endcomment %} {% comment %}
+                  </div>
+                  {% endcomment %} {% comment %}
+                </div>
+                {% endcomment %} {% comment %}
+                <div style="display: flex; align-items: center; gap: 12px">
+                  {% endcomment %} {% comment %}
+                  <div class="pay-amount">₦6,500</div>
+                  {% endcomment %} {% comment %}
+                  <div class="pay-status paid">Paid</div>
+                  {% endcomment %} {% comment %}
+                </div>
+                {% endcomment %} {% comment %}
+              </div>
+              {% endcomment %} {% comment %}
+              <div class="pay-row">
+                {% endcomment %} {% comment %}
+                <div class="pay-method">
+                  {% endcomment %} {% comment %}
+                  <div class="pay-icon">💳</div>
+                  {% endcomment %} {% comment %}
+                  <div>
+                    {% endcomment %} {% comment %}
+                    <div class="pay-name">Monthly Plan</div>
+                    {% endcomment %} {% comment %}
+                    <div class="pay-date">Previous period</div>
+                    {% endcomment %} {% comment %}
+                  </div>
+                  {% endcomment %} {% comment %}
+                </div>
+                {% endcomment %} {% comment %}
+                <div style="display: flex; align-items: center; gap: 12px">
+                  {% endcomment %} {% comment %}
+                  <div class="pay-amount">₦2,500</div>
+                  {% endcomment %} {% comment %}
+                  <div class="pay-status paid">Paid</div>
+                  {% endcomment %} {% comment %}
+                </div>
+                {% endcomment %} {% comment %}
+              </div>
+              {% endcomment %} {% comment %}
+            </div>
+            {% endcomment %}
+          </div>
+          <!-- /payment -->
+
+          <!-- ══════════════════════════════
            PAGE: PROFILE
       ══════════════════════════════ -->
-      <div class="page" id="page-profile">
+          <div class="page" id="page-profile">
+            <!-- Profile Hero -->
+            <div class="profile-hero">
+              <div class="profile-avatar">
+                {{ user.username|slice:":1"|upper }}
+              </div>
+              <div>
+                <div class="profile-name">
+                  {{ user.get_full_name|default:user.username }}
+                </div>
+                <div class="profile-id">
+                  Student ID: #EDU-{{ user.id|stringformat:"04d" }}
+                </div>
+                <div class="profile-badges">
+                  <div class="pbadge">🎓 Student</div>
+                  <div class="pbadge">✅ Verified</div>
+                  <div class="pbadge">
+                    📅 {{ subscription.end_date|date:"M Y" }}
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        <!-- Profile Hero -->
-        <div class="profile-hero">
-          <div class="profile-avatar">{{ user.username|slice:":1"|upper }}</div>
-          <div>
-            <div class="profile-name">{{ user.get_full_name|default:user.username }}</div>
-            <div class="profile-id">Student ID: #EDU-{{ user.id|stringformat:"04d" }}</div>
-            <div class="profile-badges">
-              <div class="pbadge">🎓 Student</div>
-              <div class="pbadge">✅ Verified</div>
-              <div class="pbadge">📅 {{ subscription.end_date|date:"M Y" }}</div>
+            <!-- Personal Info -->
+            <div class="card-box">
+              <div class="card-header-row">
+                <h3 class="card-title">👤 Personal Information</h3>
+              </div>
+              <div class="info-grid">
+                <div class="info-field">
+                  <label>Username</label>
+                  <div class="val">{{ user.username }}</div>
+                </div>
+                <div class="info-field">
+                  <label>Full Name</label>
+                  <div class="val">
+                    {{ user.get_full_name|default:"Not set" }}
+                  </div>
+                </div>
+                <div class="info-field">
+                  <label>Email Address</label>
+                  <div class="val">{{ user.email|default:"Not set" }}</div>
+                </div>
+                <div class="info-field">
+                  <label>Member Since</label>
+                  <div class="val">{{ user.date_joined|date:"F j, Y" }}</div>
+                </div>
+                <div class="info-field">
+                  <label>Subscription Expires</label>
+                  <div class="val">
+                    {{ subscription.end_date|date:"F j, Y" }}
+                  </div>
+                </div>
+                <div class="info-field">
+                  <label>Total Exams Taken</label>
+                  <div class="val">{{ attempts|length }}</div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Personal Info -->
-        <div class="card-box">
-          <div class="card-header-row">
-            <h3 class="card-title">👤 Personal Information</h3>
-            {% comment %} <button class="btn-outline">✏️ Edit Profile</button> {% endcomment %}
-          </div>
-          <div class="info-grid">
-            <div class="info-field">
-              <label>Username</label>
-              <div class="val">{{ user.username }}</div>
-            </div>
-            <div class="info-field">
-              <label>Full Name</label>
-              <div class="val">{{ user.get_full_name|default:"Not set" }}</div>
-            </div>
-            <div class="info-field">
-              <label>Email Address</label>
-              <div class="val">{{ user.email|default:"Not set" }}</div>
-            </div>
-            <div class="info-field">
-              <label>Member Since</label>
-              <div class="val">{{ user.date_joined|date:"F j, Y" }}</div>
-            </div>
-            <div class="info-field">
-              <label>Subscription Expires</label>
-              <div class="val">{{ subscription.end_date|date:"F j, Y" }}</div>
-            </div>
-            <div class="info-field">
-              <label>Total Exams Taken</label>
-              <div class="val">{{ attempts|length }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Subject Progress -->
-        <div class="card-box">
-          <div class="card-header-row">
-            <h3 class="card-title">📈 Subject Progress</h3>
-          </div>
-          {% for quiz in quizzes %}
-          <div class="progress-item">
-            <div class="progress-top">
-              <span>{{ quiz.title }}</span>
-              <span style="color:var(--muted);">–%</span>
-            </div>
-            <div class="progress-bar-wrap">
-              <div class="progress-bar-fill" style="width: 0%;"></div>
-            </div>
-          </div>
-          {% empty %}
-          <div class="empty-state"><span class="ei">📭</span>No subjects enrolled.</div>
-          {% endfor %}
-        </div>
-
-        <!-- Achievements -->
-        <div class="card-box">
-          <div class="card-header-row">
-            <h3 class="card-title">🏆 Achievements</h3>
-          </div>
-          <div class="achieve-grid">
-            <div class="achieve-item">
-              <span class="achieve-icon">🚀</span>
-              <div class="achieve-name">First Exam</div>
-              <div class="achieve-desc">Took your first exam</div>
-            </div>
-            <div class="achieve-item">
-              <span class="achieve-icon">🔥</span>
-              <div class="achieve-name">On a Streak</div>
-              <div class="achieve-desc">3 days in a row</div>
-            </div>
-            <div class="achieve-item">
-              <span class="achieve-icon">⭐</span>
-              <div class="achieve-name">High Scorer</div>
-              <div class="achieve-desc">Score above 80%</div>
-            </div>
-            <div class="achieve-item">
-              <span class="achieve-icon">🎯</span>
-              <div class="achieve-name">Focused</div>
-              <div class="achieve-desc">5 exams completed</div>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /profile -->
-
-    </div><!-- /page-content -->
-  </div><!-- /main -->
-</div><!-- /shell -->
-
-
-<!-- RESULT MODAL -->
-<div class="modal fade" id="resultModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">📊 Examination Results</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="table-responsive">
-          <table class="results-table">
-            <thead><tr><th>Quiz</th><th>Score</th><th>Total</th><th>Date</th></tr></thead>
-            <tbody>
-              {% for a in attempts %}
-              <tr>
-                <td><strong>{{ a.quiz.title }}</strong></td>
-                <td><span class="score-pill">{{ a.score }}</span></td>
-                <td>{{ a.total_marks }}</td>
-                <td>{{ a.taken_at|date:"d M Y, H:i" }}</td>
-              </tr>
+            <!-- Subject Progress -->
+            <div class="card-box">
+              <div class="card-header-row">
+                <h3 class="card-title">📈 Subject Progress</h3>
+              </div>
+              {% for quiz in quizzes %}
+              <div class="progress-item">
+                <div class="progress-top">
+                  <span>{{ quiz.title }}</span>
+                  <span style="color: var(--muted)">–%</span>
+                </div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill" style="width: 0%"></div>
+                </div>
+              </div>
               {% empty %}
-              <tr><td colspan="4"><div class="empty-state"><span class="ei">📭</span>No attempts yet. Start your first exam!</div></td></tr>
+              <div class="empty-state">
+                <span class="ei">📭</span>No subjects enrolled.
+              </div>
               {% endfor %}
-            </tbody>
-          </table>
+            </div>
+
+            <!-- Achievements -->
+            <div class="card-box">
+              <div class="card-header-row">
+                <h3 class="card-title">🏆 Achievements</h3>
+              </div>
+              <div class="achieve-grid">
+                <div class="achieve-item">
+                  <span class="achieve-icon">🚀</span>
+                  <div class="achieve-name">First Exam</div>
+                  <div class="achieve-desc">Took your first exam</div>
+                </div>
+                <div class="achieve-item">
+                  <span class="achieve-icon">🔥</span>
+                  <div class="achieve-name">On a Streak</div>
+                  <div class="achieve-desc">3 days in a row</div>
+                </div>
+                <div class="achieve-item">
+                  <span class="achieve-icon">⭐</span>
+                  <div class="achieve-name">High Scorer</div>
+                  <div class="achieve-desc">Score above 80%</div>
+                </div>
+                <div class="achieve-item">
+                  <span class="achieve-icon">🎯</span>
+                  <div class="achieve-name">Focused</div>
+                  <div class="achieve-desc">5 exams completed</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /profile -->
+        </div>
+        <!-- /page-content -->
+      </div>
+      <!-- /main -->
+    </div>
+    <!-- /shell -->
+
+    <!-- RESULT MODAL -->
+    <div class="modal fade" id="resultModal" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">📊 Examination Results</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="table-responsive">
+              <table class="results-table">
+                <thead>
+                  <tr>
+                    <th>Quiz</th>
+                    <th>Score</th>
+                    <th>Total</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for a in attempts %}
+                  <tr>
+                    <td><strong>{{ a.quiz.title }}</strong></td>
+                    <td><span class="score-pill">{{ a.score }}</span></td>
+                    <td>{{ a.total_marks }}</td>
+                    <td>{{ a.taken_at|date:"d M Y, H:i" }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="4">
+                      <div class="empty-state">
+                        <span class="ei">📭</span>No attempts yet. Start your
+                        first exam!
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{% static 'js/dashboard.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function previewPDF(url) {
+        const frame = document.getElementById("pdfFrame");
 
-</body>
+        // Ensure correct URL format
+        if (!url.startsWith("http")) {
+          url = window.location.origin + url;
+        }
+
+        frame.src = url + "#toolbar=0&navpanes=0";
+
+        const modal = new bootstrap.Modal(document.getElementById("pdfModal"));
+        modal.show();
+      }
+    </script>
+    <script>
+      function previewVideo(url) {
+        console.log("VIDEO URL:", url);
+
+        if (!url) {
+          alert("Video not available");
+          return;
+        }
+
+        const frame = document.getElementById("videoFrame");
+
+        frame.src = url + "?autoplay=1";
+
+        const modal = new bootstrap.Modal(
+          document.getElementById("videoModal"),
+        );
+        modal.show();
+      }
+
+      // stop video when modal closes
+      document
+        .getElementById("videoModal")
+        .addEventListener("hidden.bs.modal", function () {
+          document.getElementById("videoFrame").src = "";
+        });
+    </script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
+  </body>
 </html>

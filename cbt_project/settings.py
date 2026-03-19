@@ -5,6 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-change-me'
 DEBUG = True
+# ALLOWED_HOSTS = [ ]
 ALLOWED_HOSTS = [ 'danify-ea5k.onrender.com',]
 
 INSTALLED_APPS = [
@@ -77,7 +78,16 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = "/static/"
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+SECURE_CONTENT_TYPE_NOSNIFF = False
+# ================= MEDIA SETTINGS (ADD THIS) =================
+import os
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Allow iframe (VERY IMPORTANT for PDF preview)
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Allow more fields in POST requests
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 20000 # or higher if needed

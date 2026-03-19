@@ -377,30 +377,99 @@
   }
 
 
-  /* ── RESPONSIVE ── */
-  @media (max-width: 860px) {
-    .reg-card {
-      grid-template-columns: 1fr;
-      max-width: 540px;
-    }
-    .panel-left { padding: 2.5rem 2.5rem 2rem; }
-    .steps { display: none; }
-    .panel-left-footer { display: none; }
-    .panel-left h1 { font-size: 1.9rem; }
-    .panel-right { padding: 2.5rem; }
+  /* ── IMPROVED RESPONSIVE FIX ── */
+
+/* TABLET */
+@media (max-width: 860px) {
+  body {
+    padding: 1rem;
+    align-items: flex-start; /* fix vertical overflow */
   }
 
-
-  @media (max-width: 540px) {
-    body { padding: 0; align-items: flex-start; }
-    .reg-card { border-radius: 0; box-shadow: none; min-height: 100vh; }
-    .panel-left { padding: 2rem 1.5rem 1.8rem; }
-    .panel-right { padding: 2rem 1.5rem 2.5rem; }
-    .field-row { grid-template-columns: 1fr; }
+  .reg-card {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+    min-height: auto;
   }
 
-
-  @media (max-width: 380px) {
-    .panel-left h1 { font-size: 1.6rem; }
-    .form-header h2 { font-size: 1.15rem; }
+  .panel-left {
+    padding: 2rem;
   }
+
+  .steps,
+  .panel-left-footer {
+    display: none;
+  }
+
+  .panel-right {
+    padding: 2rem;
+  }
+}
+
+
+/* MOBILE */
+@media (max-width: 576px) {
+
+  body {
+    padding: 0;
+  }
+
+  .reg-card {
+    border-radius: 0;
+    box-shadow: none;
+    width: 100%;
+  }
+
+  /* 🔥 KEY FIX: Hide left panel completely */
+  .panel-left {
+    display: none;
+  }
+
+  .panel-right {
+    padding: 1.5rem 1rem 2rem;
+    width: 100%;
+  }
+
+  /* 🔥 Stack inputs properly */
+  .field-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .field-row.single {
+    display: block;
+  }
+
+  /* Fix input scaling */
+  .panel-right input,
+  .panel-right select {
+    font-size: 16px; /* prevents zoom on iPhone */
+  }
+
+  /* Button full width */
+  .btn-register {
+    width: 100%;
+  }
+
+  /* Reduce spacing */
+  .form-header {
+    margin-bottom: 1.2rem;
+  }
+
+  .section-label {
+    margin-top: 1.2rem;
+  }
+}
+
+
+/* EXTRA SMALL DEVICES */
+@media (max-width: 380px) {
+  .panel-right {
+    padding: 1.2rem 0.8rem;
+  }
+
+  .form-header h2 {
+    font-size: 1.1rem;
+  }
+}

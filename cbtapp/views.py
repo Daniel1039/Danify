@@ -21,7 +21,15 @@ from django.shortcuts import render, redirect
 from .models import Subscription, StudentProfile, Quiz, Attempt
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
+from .models import StudyMaterial
+import random
 from django.conf import settings
+from django.http import FileResponse, Http404
+import os
+from django.conf import settings
+
+
+
 
 
 def home(request):
@@ -90,46 +98,64 @@ def login_view(request):
 # ===============================
 # DASHBOARD
 # ===============================
-
 @login_required
-
 def dashboard(request):
-    # Check subscription
-    try:
-        subscription = Subscription.objects.get(user=request.user)
-        if not subscription.is_active():
-            return redirect("subscribe")
-    except Subscription.DoesNotExist:
-        return redirect("subscribe")
+    profile = StudentProfile.objects.get(user=request.user)
 
-    # ✅ Get student profile and quizzes
-    try:
-        profile = StudentProfile.objects.get(user=request.user)
+    # ───────── FREE TRIAL LOGIC ─────────
+    if not profile.trial_used:
+        if profile.trial_start_time is None:
+            profile.trial_start_time = timezone.now()
+            profile.trial_used = True
+            profile.save()
 
-        # Fix: use 'arms__in' for ManyToManyField
-        quizzes = Quiz.objects.filter(
-            school_class=profile.school_class,
-            arms__in=[profile.arm]  # profile.arm is the student's arm
-        ).distinct()
+    trial_active = profile.trial_active()
 
-    except StudentProfile.DoesNotExist:
-        quizzes = Quiz.objects.none()
+    # ───────── SUBSCRIPTION CHECK ─────────
+    subscription = Subscription.objects.filter(user=request.user).first()
+    access_allowed = False
 
-    # Get user's attempts
+    if subscription and subscription.is_active():
+        access_allowed = True
+
+    # 🚫 BLOCK ACCESS
+    if not access_allowed and not trial_active:
+        return redirect('subscribe')
+
+    # ───────── FETCH DATA ─────────
+    quizzes = Quiz.objects.filter(
+        school_class=profile.school_class,
+        arms__in=[profile.arm]
+    ).distinct()
+
+    materials = StudyMaterial.objects.filter(
+        school_class=profile.school_class,
+        arms__in=[profile.arm]
+    ).distinct()
+
     attempts = Attempt.objects.filter(user=request.user).order_by('-taken_at')
 
-    # Calculate remaining subscription time
-    delta = subscription.end_date - timezone.now()
-    days_left = max(delta.days, 0)
-    time_remaining = delta.total_seconds()
+    # ───────── DAYS LEFT ─────────
+    days_left = None
+    if subscription and subscription.end_date:
+        delta = subscription.end_date - timezone.now()
+        days_left = max(delta.days, 0)
 
-    return render(request, "dashboard.html", {
+    # ───────── CONTEXT ─────────
+    context = {
         "quizzes": quizzes,
         "attempts": attempts,
         "subscription": subscription,
         "days_left": days_left,
-        "time_remaining": time_remaining
-    })
+        "materials": materials,
+        "trial_active": trial_active,
+        "trial_end_time": (
+            profile.trial_start_time + timezone.timedelta(minutes=profile.trial_duration_minutes)
+            if profile.trial_start_time else None
+        )
+    }
+
+    return render(request, "dashboard.html", context)
 @login_required
 def start_exam(request):
     if request.method == "POST":
@@ -168,6 +194,8 @@ def switch_subject(request):
 # ===============================
 # TAKE QUIZ
 # ==============================
+
+
 def take_quiz(request, quiz_id):
     quiz = get_object_or_404(Quiz, id=quiz_id)
 
@@ -182,6 +210,7 @@ def take_quiz(request, quiz_id):
             try:
                 profile = StudentProfile.objects.get(user=request.user)
 
+                # Create Attempt
                 attempt = Attempt.objects.create(
                     user=request.user,
                     quiz=quiz,
@@ -189,22 +218,38 @@ def take_quiz(request, quiz_id):
                     arm=profile.arm,
                 )
 
+                # Save attempt id in session
                 request.session[attempt_key] = attempt.id
+
+                # ====== SHUFFLE QUESTIONS ======
+                questions = list(Question.objects.filter(quiz=quiz))
+                random.shuffle(questions)
+                request.session[f"shuffled_questions_{quiz_id}"] = [q.id for q in questions]
+
             except StudentProfile.DoesNotExist:
-                pass
+                questions = Question.objects.filter(quiz=quiz)
+        else:
+            # Load shuffled questions from previous session
+            question_ids = request.session.get(f"shuffled_questions_{quiz_id}")
+            if question_ids:
+                questions = Question.objects.filter(id__in=question_ids)
+                # Maintain the order
+                questions = sorted(questions, key=lambda q: question_ids.index(q.id))
+            else:
+                questions = list(Question.objects.filter(quiz=quiz))
+    else:
+        questions = list(Question.objects.filter(quiz=quiz))
 
-    questions = Question.objects.filter(quiz=quiz)
-
-    if not questions.exists():
+    if not questions:
         return render(request, "no_questions.html")
 
+    # =========================
+    # Handle question index & answers
+    # =========================
     question_indexes = request.session.get("question_indexes", {})
     index = question_indexes.get(str(quiz_id), 0)
     answers = request.session.get("answers", {})
 
-    # =========================
-    # HANDLE POST
-    # =========================
     if request.method == "POST":
         selected_answer = request.POST.get("answer")
         question_id = str(questions[index].id)
@@ -228,22 +273,15 @@ def take_quiz(request, quiz_id):
         return redirect("take_quiz", quiz_id=quiz.id)
 
     # =========================
-    # TIMER
-    # =========================
-        # =========================
-    # GLOBAL EXAM TIMER (JAMB STYLE)
+    # Timer
     # =========================
     remaining_seconds = None
-
     start_time_str = request.session.get("start_time")
     total_exam_seconds = request.session.get("total_exam_seconds")
-
     if start_time_str and total_exam_seconds:
         start_time = timezone.datetime.fromisoformat(start_time_str)
         elapsed = (timezone.now() - start_time).total_seconds()
         remaining_seconds = max(0, int(total_exam_seconds - elapsed))
-
-        # 🔥 AUTO SUBMIT WHEN TIME FINISHES
         if remaining_seconds <= 0:
             return redirect("submit_exam")
 
@@ -257,7 +295,7 @@ def take_quiz(request, quiz_id):
         "questions": questions,
         "question": questions[index],
         "index": index,
-        "total_questions": questions.count(),
+        "total_questions": len(questions),
         "answers": answers,
         "selected": answers.get(str(questions[index].id)),
         "remaining_seconds": remaining_seconds,
@@ -265,7 +303,6 @@ def take_quiz(request, quiz_id):
     }
 
     return render(request, "take_quiz.html", context)
-
 
 
 @login_required
@@ -476,3 +513,12 @@ def student_register(request):
     }
 
     return render(request, 'register.html', context)
+
+
+
+def view_pdf(request, path):
+    file_path = os.path.join(settings.MEDIA_ROOT, path)
+
+    if os.path.exists(file_path):
+        return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
+    raise Http404()

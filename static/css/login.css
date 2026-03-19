@@ -434,3 +434,63 @@
   }
 
 
+/* ================= MOBILE RESPONSIVE FIX ================= */
+
+/* Fix body layout on small screens */
+@media (max-width: 768px) {
+  body {
+    display: block;
+    padding: 0;
+  }
+
+  .login-wrap {
+    grid-template-columns: 1fr;
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* Hide left panel completely */
+  .lp {
+    display: none;
+  }
+
+  /* Make right panel full width */
+  .rp {
+    padding: 1.8rem 1.2rem;
+    width: 100%;
+  }
+
+  .rp-header h2 {
+    font-size: 1.2rem;
+  }
+
+  /* Inputs full width */
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .field input {
+    font-size: 16px; /* prevents zoom on iPhone */
+  }
+
+  .btn-login {
+    width: 100%;
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+
+/* EXTRA SMALL DEVICES */
+@media (max-width: 480px) {
+  .rp {
+    padding: 1.5rem 1rem;
+  }
+
+  .rp-header h2 {
+    font-size: 1.1rem;
+  }
+} 

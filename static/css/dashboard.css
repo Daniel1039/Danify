@@ -1267,11 +1267,9 @@ display:block;
   font-size: 12px;
 }
 .pdf-container {
-  -webkit-overflow-scrolling: touch;
   width: 100%;
   height: 100%;
   overflow: auto;
-  
 }
 
 .pdf-wrapper {
@@ -1281,8 +1279,21 @@ display:block;
 }
 
 #pdf-render {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
   display: block;
-  margin: 0 auto;
+}
+.modal-dialog {
+  max-width: 95%;
+  margin: auto;
+}
+
+@media (max-width: 768px) {
+  .modal-dialog {
+    max-width: 100%;
+    margin: 0;
+  }
 }
 /* Make modal full width on mobile */
 @media (max-width: 768px) {

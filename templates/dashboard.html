@@ -910,47 +910,41 @@
         });
       }
       function renderPage(num) {
-        pdfDoc.getPage(num).then((page) => {
+        pdfDoc.getPage(num).then(function (page) {
+          const container = document.querySelector(".pdf-wrapper");
+
+          // ✅ Get container width (responsive)
+          const containerWidth = container.clientWidth;
+
+          // Default viewport
           const viewport = page.getViewport({ scale: 1 });
 
-          // 🔥 Get device pixel ratio (important for clarity)
-          const devicePixelRatio = window.devicePixelRatio || 1;
+          // ✅ Calculate scale dynamically
+          const scale = containerWidth / viewport.width;
 
-          // 🔥 Fit to screen width
-          const screenWidth = window.innerWidth;
-          let scale = screenWidth / viewport.width;
+          const scaledViewport = page.getViewport({ scale: scale });
 
-          // Optional: limit zoom
-          if (scale > 2) scale = 2;
+          // ✅ Handle high DPI screens (Android fix)
+          const outputScale = window.devicePixelRatio || 1;
 
-          // 🔥 Apply pixel ratio for sharp rendering
-          const scaledViewport = page.getViewport({
-            scale: scale * devicePixelRatio,
-          });
+          canvas.width = Math.floor(scaledViewport.width * outputScale);
+          canvas.height = Math.floor(scaledViewport.height * outputScale);
 
-          // 🔥 Set canvas resolution properly
-          canvas.width = scaledViewport.width;
-          canvas.height = scaledViewport.height;
+          canvas.style.width = scaledViewport.width + "px";
+          canvas.style.height = scaledViewport.height + "px";
 
-          // 🔥 Scale the display size (CSS)
-          canvas.style.width = `${viewport.width * scale}px`;
-          canvas.style.height = `${viewport.height * scale}px`;
+          const transform =
+            outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
 
           const renderContext = {
             canvasContext: ctx,
             viewport: scaledViewport,
+            transform: transform,
           };
 
           page.render(renderContext);
-
-          document.getElementById("page-info").innerText =
-            `Page ${num} of ${pdfDoc.numPages}`;
-
-          // ✅ Auto scroll to top
-          document.querySelector(".pdf-container").scrollTop = 0;
         });
       }
-
       function nextPage() {
         if (pageNum >= pdfDoc.numPages) return;
         pageNum++;

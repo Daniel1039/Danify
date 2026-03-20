@@ -27,6 +27,7 @@ from django.conf import settings
 from django.http import FileResponse, Http404
 import os
 from django.conf import settings
+from datetime import timedelta
 
 
 
@@ -101,15 +102,15 @@ def login_view(request):
 @login_required
 def dashboard(request):
     profile = StudentProfile.objects.get(user=request.user)
+       # ✅ START TRIAL (ONLY ONCE)
+    if not profile.trial_start_time:
+        profile.trial_start_time = timezone.now()
+        profile.save()
 
-    # ───────── FREE TRIAL LOGIC ─────────
-    if not profile.trial_used:
-        if profile.trial_start_time is None:
-            profile.trial_start_time = timezone.now()
-            profile.trial_used = True
-            profile.save()
-
-    trial_active = profile.trial_active()
+    # ✅ CALCULATE TRIAL
+    trial_duration = timedelta(minutes=profile.trial_duration_minutes)
+    trial_end_time = profile.trial_start_time + trial_duration
+    trial_active = timezone.now() < trial_end_time
 
     # ───────── SUBSCRIPTION CHECK ─────────
     subscription = Subscription.objects.filter(user=request.user).first()

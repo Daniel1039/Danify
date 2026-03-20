@@ -162,7 +162,6 @@ class Attempt(models.Model):
 # STUDENT PROFILE
 # ============================
 from django.utils import timezone
-
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     
@@ -179,9 +178,8 @@ class StudentProfile(models.Model):
         blank=True
     )
 
-    # ✅ FREE TRIAL FIELDS
+    # ✅ FREE TRIAL
     trial_start_time = models.DateTimeField(null=True, blank=True)
-    trial_used = models.BooleanField(default=False)  # IMPORTANT
     trial_duration_minutes = models.IntegerField(default=9)
 
     def trial_active(self):
@@ -189,10 +187,6 @@ class StudentProfile(models.Model):
             return False
         end_time = self.trial_start_time + timezone.timedelta(minutes=self.trial_duration_minutes)
         return timezone.now() < end_time
-
-    def __str__(self):
-        return f"{self.user.username} ({self.school_class} {self.arm or ''})"
-
 class Subscription(models.Model):
 
     STATUS_CHOICES = (

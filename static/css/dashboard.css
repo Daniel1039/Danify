@@ -1267,9 +1267,11 @@ display:block;
   font-size: 12px;
 }
 .pdf-container {
+  -webkit-overflow-scrolling: touch;
   width: 100%;
   height: 100%;
   overflow: auto;
+  
 }
 
 .pdf-wrapper {
@@ -1277,10 +1279,10 @@ display:block;
   display: flex;
   justify-content: center;
 }
+
 #pdf-render {
-  max-width: 100%;
-  height: auto !important;
-  touch-action: pan-x pan-y;
+  display: block;
+  margin: 0 auto;
 }
 /* Make modal full width on mobile */
 @media (max-width: 768px) {

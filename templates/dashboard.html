@@ -913,25 +913,40 @@
         pdfDoc.getPage(num).then((page) => {
           const viewport = page.getViewport({ scale: 1 });
 
+          // 🔥 Get device pixel ratio (important for clarity)
+          const devicePixelRatio = window.devicePixelRatio || 1;
+
+          // 🔥 Fit to screen width
           const screenWidth = window.innerWidth;
           let scale = screenWidth / viewport.width;
 
-          if (scale > 1.5) scale = 1.5;
+          // Optional: limit zoom
+          if (scale > 2) scale = 2;
 
-          const scaledViewport = page.getViewport({ scale: scale });
+          // 🔥 Apply pixel ratio for sharp rendering
+          const scaledViewport = page.getViewport({
+            scale: scale * devicePixelRatio,
+          });
 
-          canvas.height = scaledViewport.height;
+          // 🔥 Set canvas resolution properly
           canvas.width = scaledViewport.width;
+          canvas.height = scaledViewport.height;
 
-          page.render({
+          // 🔥 Scale the display size (CSS)
+          canvas.style.width = `${viewport.width * scale}px`;
+          canvas.style.height = `${viewport.height * scale}px`;
+
+          const renderContext = {
             canvasContext: ctx,
             viewport: scaledViewport,
-          });
+          };
+
+          page.render(renderContext);
 
           document.getElementById("page-info").innerText =
             `Page ${num} of ${pdfDoc.numPages}`;
 
-          // ✅ 🔥 AUTO SCROLL TO TOP
+          // ✅ Auto scroll to top
           document.querySelector(".pdf-container").scrollTop = 0;
         });
       }

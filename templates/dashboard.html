@@ -118,7 +118,7 @@
             {% if trial_active %}
             <p style="margin-top: 10px; font-weight: 500; color: #dc2626">
               Your free trial ends in: <span id="countdown"></span>
-              to continute click on payment and subscribe 
+              to continute click on payment and subscribe
             </p>
             <script>
               let endTime = new Date(
@@ -478,13 +478,27 @@
                   ></button>
                 </div>
                 <div class="modal-body" style="height: 80vh">
-                  <iframe
-                    id="pdfFrame"
-                    src=""
-                    width="100%"
-                    height="100%"
-                    style="border: none"
-                  ></iframe>
+                  <div class="pdf-container">
+                    <div class="pdf-wrapper">
+                      <canvas id="pdf-render"></canvas>
+                    </div>
+
+                    <div class="pdf-controls mt-2">
+                      <button
+                        onclick="prevPage()"
+                        class="btn btn-sm btn-primary"
+                      >
+                        ⬅
+                      </button>
+                      <span id="page-info"></span>
+                      <button
+                        onclick="nextPage()"
+                        class="btn btn-sm btn-primary"
+                      >
+                        ➡
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -873,18 +887,65 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      function previewPDF(url) {
-        const frame = document.getElementById("pdfFrame");
+      let pdfDoc = null;
+      let pageNum = 1;
+      let canvas, ctx;
 
-        // Ensure correct URL format
+      function previewPDF(url) {
+        // ✅ initialize canvas here (VERY IMPORTANT)
+        canvas = document.getElementById("pdf-render");
+        ctx = canvas.getContext("2d");
+
         if (!url.startsWith("http")) {
           url = window.location.origin + url;
         }
 
-        frame.src = url + "#toolbar=0&navpanes=0";
-
         const modal = new bootstrap.Modal(document.getElementById("pdfModal"));
         modal.show();
+
+        pdfjsLib.getDocument(url).promise.then((pdf) => {
+          pdfDoc = pdf;
+          pageNum = 1;
+          renderPage(pageNum);
+        });
+      }
+      function renderPage(num) {
+        pdfDoc.getPage(num).then((page) => {
+          const viewport = page.getViewport({ scale: 1 });
+
+          const screenWidth = window.innerWidth;
+          let scale = screenWidth / viewport.width;
+
+          if (scale > 1.5) scale = 1.5;
+
+          const scaledViewport = page.getViewport({ scale: scale });
+
+          canvas.height = scaledViewport.height;
+          canvas.width = scaledViewport.width;
+
+          page.render({
+            canvasContext: ctx,
+            viewport: scaledViewport,
+          });
+
+          document.getElementById("page-info").innerText =
+            `Page ${num} of ${pdfDoc.numPages}`;
+
+          // ✅ 🔥 AUTO SCROLL TO TOP
+          document.querySelector(".pdf-container").scrollTop = 0;
+        });
+      }
+
+      function nextPage() {
+        if (pageNum >= pdfDoc.numPages) return;
+        pageNum++;
+        renderPage(pageNum);
+      }
+
+      function prevPage() {
+        if (pageNum <= 1) return;
+        pageNum--;
+        renderPage(pageNum);
       }
     </script>
     <script>
@@ -913,6 +974,7 @@
           document.getElementById("videoFrame").src = "";
         });
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="{% static 'js/dashboard.js' %}"></script>
   </body>
 </html>

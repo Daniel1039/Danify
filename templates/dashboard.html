@@ -466,8 +466,6 @@
           </div>
 
           <!-- PDF Preview Modal -->
-          <!-- PDF Preview Modal -->
-          <!-- PDF Preview Modal -->
           <div class="modal fade" id="pdfModal" tabindex="-1">
             <div class="modal-dialog modal-xl modal-dialog-centered">
               <div class="modal-content">
@@ -479,72 +477,26 @@
                     data-bs-dismiss="modal"
                   ></button>
                 </div>
-                <div class="modal-body pdf-modal-body">
-                  <!-- Search Bar -->
-                  <div class="pdf-search-bar">
-                    <input
-                      type="text"
-                      id="pdf-search-input"
-                      placeholder="Search in PDF..."
-                    />
-                    <button
-                      onclick="searchInPDF()"
-                      class="btn btn-sm btn-primary"
-                    >
-                      🔍
-                    </button>
-                    <button
-                      onclick="clearSearch()"
-                      class="btn btn-sm btn-secondary"
-                    >
-                      ✕
-                    </button>
-                    <span id="search-results-info"></span>
-                  </div>
-
+                <div class="modal-body" style="height: 80vh">
                   <div class="pdf-container">
                     <div class="pdf-wrapper">
                       <canvas id="pdf-render"></canvas>
-                      <!-- Highlight layer for search results -->
-                      <div id="pdf-highlights"></div>
                     </div>
 
-                    <div class="pdf-controls">
-                      <div class="pdf-controls-group">
-                        <button
-                          onclick="prevPage()"
-                          class="btn btn-sm btn-primary"
-                        >
-                          ⬅
-                        </button>
-                        <span id="page-info"></span>
-                        <button
-                          onclick="nextPage()"
-                          class="btn btn-sm btn-primary"
-                        >
-                          ➡
-                        </button>
-                      </div>
-
-                      <!-- Search Navigation -->
-                      <div class="pdf-controls-group search-controls">
-                        <button
-                          onclick="prevSearchResult()"
-                          class="btn btn-sm btn-success"
-                          id="prev-result-btn"
-                          disabled
-                        >
-                          ⬆ Prev
-                        </button>
-                        <button
-                          onclick="nextSearchResult()"
-                          class="btn btn-sm btn-success"
-                          id="next-result-btn"
-                          disabled
-                        >
-                          ⬇ Next
-                        </button>
-                      </div>
+                    <div class="pdf-controls mt-2">
+                      <button
+                        onclick="prevPage()"
+                        class="btn btn-sm btn-primary"
+                      >
+                        ⬅
+                      </button>
+                      <span id="page-info"></span>
+                      <button
+                        onclick="nextPage()"
+                        class="btn btn-sm btn-primary"
+                      >
+                        ➡
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -935,319 +887,76 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-  let pdfDoc = null;
-  let pageNum = 1;
-  let canvas, ctx;
-  let searchMatches = [];
-  let currentMatchIndex = -1;
-  let currentPageMatches = [];
+      let pdfDoc = null;
+      let pageNum = 1;
+      let canvas, ctx;
 
-  function previewPDF(url) {
-    canvas = document.getElementById("pdf-render");
-    ctx = canvas.getContext("2d");
-    clearSearch();
+      function previewPDF(url) {
+        // ✅ initialize canvas here (VERY IMPORTANT)
+        canvas = document.getElementById("pdf-render");
+        ctx = canvas.getContext("2d");
 
-    if (!url.startsWith("http")) {
-      url = window.location.origin + url;
-    }
-
-    const modal = new bootstrap.Modal(document.getElementById("pdfModal"));
-    modal.show();
-
-    // Wait for modal animation to complete - FIXED
-    const modalElement = document.getElementById("pdfModal");
-    modalElement.addEventListener(
-      "shown.bs.modal",
-      function onModalShown() {
-        pdfjsLib
-          .getDocument(url)
-          .promise.then((pdf) => {
-            pdfDoc = pdf;
-            pageNum = 1;
-            renderPage(pageNum);
-          })
-          .catch((error) => {
-            console.error("Error loading PDF:", error);
-            alert("Failed to load PDF. Please try again.");
-          });
-        modalElement.removeEventListener("shown.bs.modal", onModalShown);
-      },
-      { once: true },
-    );
-  }
-
-  function renderPage(num) {
-    pdfDoc.getPage(num).then(function (page) {
-      const container = document.querySelector(".pdf-wrapper");
-
-      // Ensure container has dimensions
-      if (!container.clientWidth || !container.clientHeight) {
-        setTimeout(() => renderPage(num), 100);
-        return;
-      }
-
-      // IMPROVED: Better padding calculation for larger display
-      const containerWidth = container.clientWidth - 40;
-      const containerHeight = container.clientHeight - 40;
-
-      const viewport = page.getViewport({ scale: 1 });
-
-      const scaleWidth = containerWidth / viewport.width;
-      const scaleHeight = containerHeight / viewport.height;
-
-      // IMPROVED: Better scaling logic for different screen sizes
-      let scale = Math.min(scaleWidth, scaleHeight);
-      
-      if (window.innerWidth > 768) {
-        // Desktop/Laptop: allow larger zoom for better readability
-        scale = Math.min(scale, 3.5);
-        scale = Math.max(scale, 1.2); // Minimum readable size
-      } else {
-        // Mobile: moderate zoom
-        scale = Math.min(scale, 2.5);
-      }
-
-      const scaledViewport = page.getViewport({ scale: scale });
-      const outputScale = window.devicePixelRatio || 1;
-
-      canvas.width = Math.floor(scaledViewport.width * outputScale);
-      canvas.height = Math.floor(scaledViewport.height * outputScale);
-      canvas.style.width = scaledViewport.width + "px";
-      canvas.style.height = scaledViewport.height + "px";
-
-      const transform =
-        outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-
-      const renderContext = {
-        canvasContext: ctx,
-        viewport: scaledViewport,
-        transform: transform,
-      };
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      page.render(renderContext).promise.then(() => {
-        document.getElementById("page-info").textContent =
-          `Page ${num} of ${pdfDoc.numPages}`;
-        if (searchMatches.length > 0) {
-          highlightSearchOnPage(pageNum);
+        if (!url.startsWith("http")) {
+          url = window.location.origin + url;
         }
-      });
-    });
-  }
 
-  function nextPage() {
-    if (pageNum >= pdfDoc.numPages) return;
-    pageNum++;
-    renderPage(pageNum);
-  }
+        const modal = new bootstrap.Modal(document.getElementById("pdfModal"));
+        modal.show();
 
-  function prevPage() {
-    if (pageNum <= 1) return;
-    pageNum--;
-    renderPage(pageNum);
-  }
+        pdfjsLib.getDocument(url).promise.then((pdf) => {
+          pdfDoc = pdf;
+          pageNum = 1;
+          renderPage(pageNum);
+        });
+      }
+      function renderPage(num) {
+        pdfDoc.getPage(num).then(function (page) {
+          const container = document.querySelector(".pdf-wrapper");
 
-  // Handle window resize
-  let resizeTimeout;
-  window.addEventListener("resize", function () {
-    if (
-      pdfDoc &&
-      document.getElementById("pdfModal").classList.contains("show")
-    ) {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
+          // ✅ Get container width (responsive)
+          const containerWidth = container.clientWidth;
+
+          // Default viewport
+          const viewport = page.getViewport({ scale: 1 });
+
+          // ✅ Calculate scale dynamically
+          const scale = containerWidth / viewport.width;
+
+          const scaledViewport = page.getViewport({ scale: scale });
+
+          // ✅ Handle high DPI screens (Android fix)
+          const outputScale = window.devicePixelRatio || 1;
+
+          canvas.width = Math.floor(scaledViewport.width * outputScale);
+          canvas.height = Math.floor(scaledViewport.height * outputScale);
+
+          canvas.style.width = scaledViewport.width + "px";
+          canvas.style.height = scaledViewport.height + "px";
+
+          const transform =
+            outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
+
+          const renderContext = {
+            canvasContext: ctx,
+            viewport: scaledViewport,
+            transform: transform,
+          };
+
+          page.render(renderContext);
+        });
+      }
+      function nextPage() {
+        if (pageNum >= pdfDoc.numPages) return;
+        pageNum++;
         renderPage(pageNum);
-      }, 250);
-    }
-  });
-
-  async function searchInPDF() {
-    const searchTerm = document
-      .getElementById("pdf-search-input")
-      .value.trim();
-
-    if (!searchTerm) {
-      alert("Please enter a search term");
-      return;
-    }
-
-    if (!pdfDoc) return;
-
-    searchMatches = [];
-    currentMatchIndex = -1;
-
-    // Search through all pages
-    for (let i = 1; i <= pdfDoc.numPages; i++) {
-      const page = await pdfDoc.getPage(i);
-      const textContent = await page.getTextContent();
-      const viewport = page.getViewport({ scale: 1 });
-
-      textContent.items.forEach((item) => {
-        const text = item.str;
-        const textLower = text.toLowerCase();
-        const searchLower = searchTerm.toLowerCase();
-
-        // Find all occurrences of the search term in this text item
-        let index = textLower.indexOf(searchLower);
-        while (index !== -1) {
-          searchMatches.push({
-            pageNum: i,
-            text: text,
-            transform: item.transform,
-            width: item.width,
-            height: item.height,
-            index: index,
-            searchTerm: searchTerm,
-            viewport: viewport,
-            fontName: item.fontName || "default",
-          });
-          index = textLower.indexOf(searchLower, index + 1);
-        }
-      });
-    }
-
-    const resultsInfo = document.getElementById("search-results-info");
-    if (searchMatches.length > 0) {
-      resultsInfo.textContent = `✓ ${searchMatches.length} match${searchMatches.length > 1 ? "es" : ""} found`;
-      resultsInfo.className = "has-results";
-      currentMatchIndex = 0;
-
-      document.getElementById("prev-result-btn").disabled = false;
-      document.getElementById("next-result-btn").disabled = false;
-
-      jumpToMatch(0);
-    } else {
-      resultsInfo.textContent = "✗ No matches found";
-      resultsInfo.style.color = "#dc2626";
-      resultsInfo.className = "";
-      document.getElementById("prev-result-btn").disabled = true;
-      document.getElementById("next-result-btn").disabled = true;
-    }
-  }
-
-  async function highlightSearchOnPage(pageNumber) {
-    const highlightLayer = document.getElementById("pdf-highlights");
-    highlightLayer.innerHTML = "";
-
-    currentPageMatches = searchMatches.filter(
-      (m) => m.pageNum === pageNumber,
-    );
-
-    if (currentPageMatches.length === 0) return;
-
-    const container = document.querySelector(".pdf-wrapper");
-    const containerWidth = container.clientWidth - 40; // Match renderPage padding
-    const page = await pdfDoc.getPage(pageNumber);
-    const viewport = page.getViewport({ scale: 1 });
-    
-    // IMPROVED: Use same scale calculation as renderPage
-    const containerHeight = container.clientHeight - 40;
-    const scaleWidth = containerWidth / viewport.width;
-    const scaleHeight = containerHeight / viewport.height;
-    let scale = Math.min(scaleWidth, scaleHeight);
-    
-    if (window.innerWidth > 768) {
-      scale = Math.min(scale, 3.5);
-      scale = Math.max(scale, 1.2);
-    } else {
-      scale = Math.min(scale, 2.5);
-    }
-
-    currentPageMatches.forEach((match) => {
-      // Calculate the width of one character (approximate)
-      const charWidth = match.width / match.text.length;
-
-      // Calculate position and size for ONLY the matched word
-      const matchStartX = match.transform[4] + charWidth * match.index;
-      const matchWidth = charWidth * match.searchTerm.length;
-
-      // Apply scale for display
-      const tx = matchStartX * scale;
-      const ty = (viewport.height - match.transform[5]) * scale;
-      const width = matchWidth * scale;
-      const height = match.height * scale;
-
-      // Create highlight div for ONLY the matched word
-      const highlight = document.createElement("div");
-      highlight.className = "pdf-highlight";
-      highlight.style.left = tx + "px";
-      highlight.style.top = ty - height + "px";
-      highlight.style.width = width + "px";
-      highlight.style.height = height + "px";
-
-      const globalIndex = searchMatches.indexOf(match);
-      const isCurrentMatch = globalIndex === currentMatchIndex;
-
-      if (isCurrentMatch) {
-        highlight.classList.add("current");
       }
 
-      highlightLayer.appendChild(highlight);
-    });
-  }
-
-  function jumpToMatch(index) {
-    if (index < 0 || index >= searchMatches.length) return;
-
-    currentMatchIndex = index;
-    const match = searchMatches[index];
-
-    const resultsInfo = document.getElementById("search-results-info");
-    resultsInfo.textContent = `📍 Match ${index + 1} of ${searchMatches.length}`;
-    resultsInfo.className = "has-results";
-
-    if (pageNum !== match.pageNum) {
-      pageNum = match.pageNum;
-      renderPage(pageNum);
-    } else {
-      highlightSearchOnPage(pageNum);
-    }
-  }
-
-  function nextSearchResult() {
-    if (searchMatches.length === 0) return;
-    const nextIndex = (currentMatchIndex + 1) % searchMatches.length;
-    jumpToMatch(nextIndex);
-  }
-
-  function prevSearchResult() {
-    if (searchMatches.length === 0) return;
-    const prevIndex =
-      (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length;
-    jumpToMatch(prevIndex);
-  }
-
-  function clearSearch() {
-    document.getElementById("pdf-search-input").value = "";
-    searchMatches = [];
-    currentMatchIndex = -1;
-    currentPageMatches = [];
-
-    const highlightLayer = document.getElementById("pdf-highlights");
-    if (highlightLayer) {
-      highlightLayer.innerHTML = "";
-    }
-
-    const resultsInfo = document.getElementById("search-results-info");
-    resultsInfo.textContent = "";
-    resultsInfo.className = "";
-
-    document.getElementById("prev-result-btn").disabled = true;
-    document.getElementById("next-result-btn").disabled = true;
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("pdf-search-input");
-    if (searchInput) {
-      searchInput.addEventListener("keypress", function (e) {
-        if (e.key === "Enter") {
-          searchInPDF();
-        }
-      });
-    }
-  });
-</script>
+      function prevPage() {
+        if (pageNum <= 1) return;
+        pageNum--;
+        renderPage(pageNum);
+      }
+    </script>
     <script>
       function previewVideo(url) {
         console.log("VIDEO URL:", url);

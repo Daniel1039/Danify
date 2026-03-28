@@ -63,37 +63,41 @@ def contact(request):
 
     return render(request, "contact.html")
 
-
 @ensure_csrf_cookie
 def login_view(request):
-    classes = SchoolClass.objects.all()
-    arms = ClassArm.objects.all()
     error = None
+    username_error = None
+    password_error = None
+    
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
-        class_id = request.POST.get("school_class")
-        arm_id = request.POST.get("arm")
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            try:
-                profile = StudentProfile.objects.get(user=user)
-                if (
-                    str(profile.school_class.id) == class_id and
-                    str(profile.arm.id) == arm_id
-                ):
+        
+        # Check if username exists
+        from django.contrib.auth.models import User
+        user_exists = User.objects.filter(username=username).exists()
+        
+        if not user_exists:
+            username_error = "This username does not exist"
+        else:
+            # Username exists, now check password
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                try:
+                    profile = StudentProfile.objects.get(user=user)
                     login(request, user)
                     return redirect("dashboard")
-                else:
-                    error = "Selected class or arm is incorrect"
-            except StudentProfile.DoesNotExist:
-                error = "Student profile not found"
-        else:
-            error = "Invalid username or password"
+                except StudentProfile.DoesNotExist:
+                    error = "Student profile not found. Please contact administration."
+            else:
+                # Username exists but password is wrong
+                password_error = "Incorrect password"
+    
     return render(request, "registration/login.html", {
-        "classes": classes,
-        "arms": arms,
-        "error": error
+        "error": error,
+        "username_error": username_error,
+        "password_error": password_error,
     })
 
 # ===============================

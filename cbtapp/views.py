@@ -30,11 +30,9 @@ from django.conf import settings
 from datetime import timedelta
 
 
-
-
-
 def home(request):
     return render(request, 'home.html')
+
 def pricing(request):
     return render(request, 'pricing.html')
 
@@ -42,7 +40,6 @@ def about(request):
     return render(request, 'about.html')
 
 def contact(request):
-
     if request.method == "POST":
         first_name = request.POST.get("firstName")
         last_name = request.POST.get("lastName")
@@ -50,8 +47,6 @@ def contact(request):
         subject = request.POST.get("subject")
         message = request.POST.get("message")
 
-        full_message = f"""
-"""       # SAVE TO DATABASE
         ContactMessage.objects.create(
             name=f"{first_name} {last_name}",
             email=email,
@@ -73,14 +68,11 @@ def login_view(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
         
-        # Check if username exists
-        from django.contrib.auth.models import User
         user_exists = User.objects.filter(username=username).exists()
         
         if not user_exists:
             username_error = "This username does not exist"
         else:
-            # Username exists, now check password
             user = authenticate(request, username=username, password=password)
             
             if user is not None:
@@ -91,7 +83,6 @@ def login_view(request):
                 except StudentProfile.DoesNotExist:
                     error = "Student profile not found. Please contact administration."
             else:
-                # Username exists but password is wrong
                 password_error = "Incorrect password"
     
     return render(request, "registration/login.html", {
@@ -106,26 +97,14 @@ def login_view(request):
 @login_required
 def dashboard(request):
     profile = StudentProfile.objects.get(user=request.user)
-       # ✅ START TRIAL (ONLY ONCE)
-    if not profile.trial_start_time:
-        profile.trial_start_time = timezone.now()
-        profile.save()
-
-    # ✅ CALCULATE TRIAL
-    trial_duration = timedelta(minutes=profile.trial_duration_minutes)
-    trial_end_time = profile.trial_start_time + trial_duration
-    trial_active = timezone.now() < trial_end_time
 
     # ───────── SUBSCRIPTION CHECK ─────────
     subscription = Subscription.objects.filter(user=request.user).first()
-    access_allowed = False
+    has_active_subscription = subscription and subscription.is_active()
 
-    if subscription and subscription.is_active():
-        access_allowed = True
-
-    # 🚫 BLOCK ACCESS
-    if not access_allowed and not trial_active:
-        return redirect('subscribe')
+    # ✅ CHECK FREE TRIAL STATUS (always show 10 questions max)
+    trial_questions_used = profile.trial_questions_used
+    is_on_free_trial = not has_active_subscription
 
     # ───────── FETCH DATA ─────────
     quizzes = Quiz.objects.filter(
@@ -153,14 +132,14 @@ def dashboard(request):
         "subscription": subscription,
         "days_left": days_left,
         "materials": materials,
-        "trial_active": trial_active,
-        "trial_end_time": (
-            profile.trial_start_time + timezone.timedelta(minutes=profile.trial_duration_minutes)
-            if profile.trial_start_time else None
-        )
+        "has_active_subscription": has_active_subscription,
+        "is_on_free_trial": is_on_free_trial,
+        "trial_questions_used": trial_questions_used,
     }
 
     return render(request, "dashboard.html", context)
+
+
 @login_required
 def start_exam(request):
     if request.method == "POST":
@@ -176,6 +155,7 @@ def start_exam(request):
         request.session["current_quiz_index"] = 0
         request.session["answers"] = {}
         request.session["question_indexes"] = {}
+        request.session["counted_questions"] = []  # Track counted questions
 
         # ✅ GLOBAL TIMER (sum of all subjects)
         total_exam_seconds = sum(q.time_limit for q in quizzes) * 60
@@ -197,10 +177,8 @@ def switch_subject(request):
 
 
 # ===============================
-# TAKE QUIZ
-# ==============================
-
-
+# TAKE QUIZ (LIMIT TO 10 QUESTIONS FOR FREE USERS)
+# ===============================
 def take_quiz(request, quiz_id):
     quiz = get_object_or_404(Quiz, id=quiz_id)
 
@@ -229,6 +207,15 @@ def take_quiz(request, quiz_id):
                 # ====== SHUFFLE QUESTIONS ======
                 questions = list(Question.objects.filter(quiz=quiz))
                 random.shuffle(questions)
+                
+                # ✅ LIMIT TO 10 QUESTIONS FOR FREE TRIAL USERS
+                subscription = Subscription.objects.filter(user=request.user).first()
+                has_active_subscription = subscription and subscription.is_active()
+                
+                if not has_active_subscription:
+                    # Free trial: always show max 10 questions
+                    questions = questions[:10]
+                
                 request.session[f"shuffled_questions_{quiz_id}"] = [q.id for q in questions]
 
             except StudentProfile.DoesNotExist:
@@ -238,7 +225,6 @@ def take_quiz(request, quiz_id):
             question_ids = request.session.get(f"shuffled_questions_{quiz_id}")
             if question_ids:
                 questions = Question.objects.filter(id__in=question_ids)
-                # Maintain the order
                 questions = sorted(questions, key=lambda q: question_ids.index(q.id))
             else:
                 questions = list(Question.objects.filter(quiz=quiz))
@@ -262,6 +248,22 @@ def take_quiz(request, quiz_id):
         if selected_answer:
             answers[question_id] = selected_answer
             request.session["answers"] = answers
+            
+            # ✅ INCREMENT TRIAL QUESTION COUNT (only once per question)
+            if request.user.is_authenticated:
+                profile = StudentProfile.objects.get(user=request.user)
+                subscription = Subscription.objects.filter(user=request.user).first()
+                has_active_subscription = subscription and subscription.is_active()
+                
+                # Only count if on free trial and not already counted
+                counted_questions = request.session.get('counted_questions', [])
+                
+                if not has_active_subscription and question_id not in counted_questions:
+                    profile.trial_questions_used += 1
+                    profile.save()
+                    
+                    counted_questions.append(question_id)
+                    request.session['counted_questions'] = counted_questions
 
         if "next" in request.POST:
             index += 1
@@ -294,6 +296,16 @@ def take_quiz(request, quiz_id):
     quiz_map = {
         str(q.id): q.title for q in Quiz.objects.filter(id__in=selected_quizzes)
     }
+    
+    # ✅ ADD FREE TRIAL INFO TO CONTEXT
+    is_on_free_trial = False
+    if request.user.is_authenticated:
+        profile = StudentProfile.objects.get(user=request.user)
+        subscription = Subscription.objects.filter(user=request.user).first()
+        has_active_subscription = subscription and subscription.is_active()
+        
+        if not has_active_subscription:
+            is_on_free_trial = True
 
     context = {
         "quiz": quiz,
@@ -305,6 +317,7 @@ def take_quiz(request, quiz_id):
         "selected": answers.get(str(questions[index].id)),
         "remaining_seconds": remaining_seconds,
         "quiz_map": quiz_map,
+        "is_on_free_trial": is_on_free_trial,
     }
 
     return render(request, "take_quiz.html", context)
@@ -312,7 +325,6 @@ def take_quiz(request, quiz_id):
 
 @login_required
 def subscribe(request):
-
     subscription, created = Subscription.objects.get_or_create(
         user=request.user
     )
@@ -331,10 +343,8 @@ def subscribe(request):
 
 
 # ===============================
- # SUBMIT EXAM
+# SUBMIT EXAM
 # ===============================
-from django.shortcuts import render
-from .models import Quiz, Question, Attempt
 @login_required
 def submit_exam(request):
     answers = request.session.get("answers", {})
@@ -359,10 +369,8 @@ def submit_exam(request):
             quiz_score = 0
             quiz_total = 0
 
-            # Get subject name
             subject_name = quiz.subject.name if quiz.subject else "General"
 
-            # Create subject entry if not exists
             if subject_name not in subject_results:
                 subject_results[subject_name] = {
                     "subject": subject_name,
@@ -397,7 +405,6 @@ def submit_exam(request):
             attempt.total_marks = quiz_total
             attempt.save()
 
-            # Add subject score
             subject_results[subject_name]["score"] += quiz_score
             subject_results[subject_name]["total"] += quiz_total
 
@@ -414,6 +421,7 @@ def submit_exam(request):
             "question_indexes",
             "start_time",
             "total_exam_seconds",
+            "counted_questions",
         ]:
             del request.session[key]
 
@@ -421,7 +429,7 @@ def submit_exam(request):
         "score": total_score,
         "total": total_marks,
         "percentage": round(percentage, 2),
-        "subject_results": subject_results.values(),  # IMPORTANT
+        "subject_results": subject_results.values(),
     })
 
 
@@ -442,7 +450,6 @@ def bulk_question_upload(request, quiz_id):
                     messages.error(request, "File format not supported.")
                     return redirect(request.path)
 
-                # Iterate through rows
                 for index, row in df.iterrows():
                     Question.objects.create(
                         quiz=quiz,
@@ -467,36 +474,31 @@ def bulk_question_upload(request, quiz_id):
 
     return render(request, 'bulk_upload.html', {'form': form, 'quiz': quiz})
 
+
 def start_selected_quizzes(request):
     if request.method == "POST":
         selected_quiz_ids = request.POST.getlist('selected_quizzes')
         quizzes = Quiz.objects.filter(id__in=selected_quiz_ids)
 
-        # Store selected quizzes
         request.session['selected_quizzes'] = [str(q.id) for q in quizzes]
 
-        # Store total time = sum of selected subjects
         total_time = sum(q.time_limit for q in quizzes)
-        request.session['total_quiz_time'] = total_time  # in minutes
+        request.session['total_quiz_time'] = total_time
 
-        # Optionally store individual times if needed
         quiz_times = {str(q.id): q.time_limit for q in quizzes}
         request.session['quiz_times'] = quiz_times
 
-        # Set first quiz as current
         request.session['current_quiz'] = str(quizzes[0].id)
 
         return redirect('take_quiz', quiz_id=quizzes[0].id)
 
 
 def student_register(request):
-
     if request.method == "POST":
         user_form = StudentRegisterForm(request.POST)
         profile_form = StudentProfileForm(request.POST)
 
         if user_form.is_valid() and profile_form.is_valid():
-
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data['password'])
             user.save()
@@ -518,7 +520,6 @@ def student_register(request):
     }
 
     return render(request, 'register.html', context)
-
 
 
 def view_pdf(request, path):

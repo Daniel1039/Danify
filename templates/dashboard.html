@@ -115,31 +115,29 @@
               <div class="welcome-emoji">🎓</div>
             </div>
             <!-- Free Trial Countdown -->
-            {% if trial_active %}
-            <p style="margin-top: 10px; font-weight: 500; color: #dc2626">
-              Your free trial ends in: <span id="countdown"></span>
-              to continute click on payment and subscribe
-            </p>
-            <script>
-              let endTime = new Date(
-                "{{ trial_end_time|date:'Y-m-d H:i:s' }}",
-              ).getTime();
-              let timer = setInterval(function () {
-                let now = new Date().getTime();
-                let distance = endTime - now;
-                if (distance < 0) {
-                  clearInterval(timer);
-                  document.getElementById("countdown").innerHTML = "Expired";
-                } else {
-                  let minutes = Math.floor(
-                    (distance % (1000 * 60 * 60)) / (1000 * 60),
-                  );
-                  let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                  document.getElementById("countdown").innerHTML =
-                    minutes + "m " + seconds + "s";
-                }
-              }, 1000);
-            </script>
+            {% if is_on_free_trial %}
+            <div
+              style="
+                margin-bottom: 20px;
+                padding: 12px 16px;
+                border-radius: 8px;
+                background: #fef3c7;
+                border-left: 4px solid #f59e0b;
+                color: #92400e;
+              "
+            >
+              <strong>📝 Free Plan:</strong> You're viewing up to 10 questions
+              per quiz.
+              <a
+                href="{% url 'subscribe' %}"
+                style="
+                  color: #92400e;
+                  text-decoration: underline;
+                  font-weight: 600;
+                "
+                >Upgrade for unlimited access</a
+              >
+            </div>
             {% endif %}
             <!-- Stats Row -->
             <div class="stats-row">

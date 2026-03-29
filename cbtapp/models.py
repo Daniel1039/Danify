@@ -178,15 +178,8 @@ class StudentProfile(models.Model):
         blank=True
     )
 
-    # ✅ FREE TRIAL
-    trial_start_time = models.DateTimeField(null=True, blank=True)
-    trial_duration_minutes = models.IntegerField(default=9)
-
-    def trial_active(self):
-        if not self.trial_start_time:
-            return False
-        end_time = self.trial_start_time + timezone.timedelta(minutes=self.trial_duration_minutes)
-        return timezone.now() < end_time
+    # ✅ FREE TRIAL - Track questions used (no blocking, just limiting)
+    trial_questions_used = models.IntegerField(default=0)  # NEW FIELD
 class Subscription(models.Model):
 
     STATUS_CHOICES = (

@@ -53,7 +53,8 @@ class QuestionInline(admin.StackedInline):
 
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'subject', 'school_class', 'display_arms', 'time_limit', 'total_questions')
+    list_display = ('title', 'subject', 'school_class',  'time_limit', 'total_questions')
+    filter_horizontal = ('arms',)
     inlines = [QuestionInline]
 
     def display_arms(self, obj):
@@ -177,14 +178,6 @@ class AttemptAdmin(admin.ModelAdmin):
 from django.urls import reverse 
 from django.utils.html import format_html
 from django.contrib import admin
-
-class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'view_class_results_link', ...)
-    
-    def view_class_results_link(self, obj):
-        url = reverse('class_quiz_result') + f'?quiz={obj.id}'
-        return format_html('<a href="{}">View Class Results</a>', url)
-    view_class_results_link.short_description = "Class Quiz Results"
 
 
 from django.contrib import admin

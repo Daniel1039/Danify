@@ -214,7 +214,7 @@ def take_quiz(request, quiz_id):
                 
                 if not has_active_subscription:
                     # Free trial: always show max 10 questions
-                    questions = questions[:10]
+                    questions = questions[:5]
                 
                 request.session[f"shuffled_questions_{quiz_id}"] = [q.id for q in questions]
 

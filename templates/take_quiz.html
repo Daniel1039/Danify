@@ -19,6 +19,142 @@
 
   <body>
     {% block content %}
+    <!-- ✅ FREE TRIAL UPGRADE POPUP -->
+{% if is_on_free_trial %}
+<div id="upgradePopup" style="
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+">
+    <div style="
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease-out;
+    ">
+        <div style="font-size: 4em; margin-bottom: 20px;">🎯</div>
+        
+        <h2 style="
+            margin: 0 0 15px 0;
+            font-size: 1.8em;
+            color: #1f2937;
+            font-weight: 700;
+        ">You're on the Free Plan</h2>
+        
+        <p style="
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+            color: #4b5563;
+            line-height: 1.6;
+        ">
+            You have access to <strong style="color: #667eea;">5 questions</strong> per quiz.
+        </p>
+        
+        <p style="
+            margin: 0 0 25px 0;
+            font-size: 1em;
+            color: #6b7280;
+        ">
+            Upgrade now for <strong>unlimited questions</strong> and full access to all features!
+        </p>
+        
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'subscribe' %}" style="
+                display: inline-block;
+                padding: 14px 30px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                text-decoration: none;
+                border-radius: 10px;
+                font-weight: 700;
+                font-size: 1.05em;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                transition: transform 0.2s;
+            " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                🚀 Upgrade Now
+            </a>
+            
+            <button onclick="closeUpgradePopup()" style="
+                padding: 14px 30px;
+                background: #e5e7eb;
+                color: #374151;
+                border: none;
+                border-radius: 10px;
+                font-weight: 600;
+                font-size: 1.05em;
+                cursor: pointer;
+                transition: background 0.2s;
+            " onmouseover="this.style.background='#d1d5db'" onmouseout="this.style.background='#e5e7eb'">
+                Continue with 5 Questions
+            </button>
+        </div>
+        
+        <p style="
+            margin: 20px 0 0 0;
+            font-size: 0.85em;
+            color: #9ca3af;
+        ">
+            This popup won't show again during this session
+        </p>
+    </div>
+</div>
+
+<style>
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script>
+    // Show popup when page loads (only once per session)
+    window.addEventListener('DOMContentLoaded', function() {
+        // Check if popup has been shown in this session
+        if (!sessionStorage.getItem('upgradePopupShown')) {
+            setTimeout(function() {
+                document.getElementById('upgradePopup').style.display = 'flex';
+                sessionStorage.setItem('upgradePopupShown', 'true');
+            }, 1000); // Show after 1 second delay
+        }
+    });
+
+    function closeUpgradePopup() {
+        document.getElementById('upgradePopup').style.display = 'none';
+    }
+
+    // Close popup when clicking outside
+    document.addEventListener('click', function(event) {
+        var popup = document.getElementById('upgradePopup');
+        if (event.target === popup) {
+            closeUpgradePopup();
+        }
+    });
+
+    // Close popup with ESC key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeUpgradePopup();
+        }
+    });
+</script>
+{% endif %}
 
     <!-- HEADER -->
     <div class="exam-header">

@@ -375,7 +375,59 @@
     color: var(--teal);
     border-color: var(--teal);
   }
+/* Fix password input padding to prevent text overlap with icon */
+.password-wrapper input[type="password"],
+.password-wrapper input[type="text"] {
+  padding-right: 2.8rem !important;
+}
 
+/* Ensure password toggle stays visible and clickable on mobile */
+.password-toggle {
+  z-index: 10;
+  padding: 0.5rem; /* Larger touch target */
+}
+
+/* Better mobile form stacking */
+@media (max-width: 576px) {
+  
+  /* Ensure all field groups take full width */
+  .field-group {
+    width: 100%;
+  }
+  
+  /* Make sure password wrapper works on mobile */
+  .password-wrapper {
+    width: 100%;
+  }
+  
+  /* Better touch target for password toggle */
+  .password-toggle {
+    right: 8px;
+    padding: 0.6rem;
+  }
+  
+  .password-toggle svg {
+    width: 22px;
+    height: 22px;
+  }
+  
+  /* Ensure inputs don't overflow */
+  .panel-right input,
+  .panel-right select {
+    max-width: 100%;
+  }
+}
+
+/* Fix for very small screens */
+@media (max-width: 380px) {
+  .field-group label {
+    font-size: 0.65rem;
+  }
+  
+  .section-label {
+    font-size: 0.58rem;
+  }
+}
 
   /* ── IMPROVED RESPONSIVE FIX ── */
 

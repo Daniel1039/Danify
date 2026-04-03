@@ -354,6 +354,10 @@ def submit_exam(request):
 
     subject_results = {}
 
+    profile = StudentProfile.objects.get(user=request.user)
+    subscription = Subscription.objects.filter(user=request.user).first()
+    has_active_subscription = subscription and subscription.is_active()
+
     for key, value in request.session.items():
         if key.startswith("attempt_"):
             quiz_id = key.split("_")[1]
@@ -364,7 +368,14 @@ def submit_exam(request):
             except (Quiz.DoesNotExist, Attempt.DoesNotExist):
                 continue
 
-            questions = Question.objects.filter(quiz=quiz)
+            # ✅ ONLY questions user saw
+            question_ids = request.session.get(f"shuffled_questions_{quiz_id}")
+
+            if question_ids:
+                questions = Question.objects.filter(id__in=question_ids)
+                questions = sorted(questions, key=lambda q: question_ids.index(q.id))
+            else:
+                questions = Question.objects.filter(quiz=quiz)
 
             quiz_score = 0
             quiz_total = 0
@@ -376,11 +387,12 @@ def submit_exam(request):
                     "subject": subject_name,
                     "score": 0,
                     "total": 0,
-                    "wrong_questions": []
+                    "wrong_questions": []  # used for ALL questions now
                 }
 
             for question in questions:
                 quiz_total += question.marks
+
                 selected_answer = answers.get(str(question.id))
 
                 options = {
@@ -390,16 +402,24 @@ def submit_exam(request):
                     "D": question.option_d,
                 }
 
+                # ✅ Determine status
                 if selected_answer == question.correct_option:
                     quiz_score += question.marks
+                    status = "correct"
+                elif selected_answer is None:
+                    status = "not_answered"
                 else:
-                    subject_results[subject_name]["wrong_questions"].append({
-                        "question_text": question.text,
-                        "options": options,
-                        "selected": selected_answer,
-                        "correct": question.correct_option,
-                        "explanation": question.explanation,
-                    })
+                    status = "wrong"
+
+                # ✅ ADD ALL QUESTIONS (VERY IMPORTANT FIX)
+                subject_results[subject_name]["wrong_questions"].append({
+                    "question_text": question.text,
+                    "options": options,
+                    "selected": selected_answer,
+                    "correct": question.correct_option,
+                    "explanation": question.explanation,
+                    "status": status,
+                })
 
             attempt.score = quiz_score
             attempt.total_marks = quiz_total
@@ -413,7 +433,7 @@ def submit_exam(request):
 
     percentage = (total_score / total_marks * 100) if total_marks else 0
 
-    # Clean session
+    # ✅ CLEAN SESSION (keep shuffled_questions)
     for key in list(request.session.keys()):
         if key.startswith("attempt_") or key in [
             "answers",
@@ -430,8 +450,9 @@ def submit_exam(request):
         "total": total_marks,
         "percentage": round(percentage, 2),
         "subject_results": subject_results.values(),
+        "has_active_subscription": has_active_subscription,
+        "is_on_free_trial": not has_active_subscription,
     })
-
 
 def bulk_question_upload(request, quiz_id):
     quiz = Quiz.objects.get(id=quiz_id)

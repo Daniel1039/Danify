@@ -138,11 +138,10 @@ def dashboard(request):
     }
 
     return render(request, "dashboard.html", context)
-
-
 @login_required
 def start_exam(request):
     if request.method == "POST":
+
         selected = request.POST.getlist("subjects")
 
         if not selected:
@@ -150,23 +149,64 @@ def start_exam(request):
 
         quizzes = Quiz.objects.filter(id__in=selected)
 
-        # Store selected quizzes
+        # ✅ CHECK SUBSCRIPTION
+        profile = StudentProfile.objects.get(user=request.user)
+        subscription = Subscription.objects.filter(user=request.user).first()
+        has_active_subscription = subscription and subscription.is_active()
+
+        # ✅ FREE TRIAL: LIMIT EACH QUIZ TO ONCE PER DAY
+        if not has_active_subscription:
+            today = timezone.now().date()
+
+            allowed_quizzes = []
+            blocked_quizzes = []
+
+            for quiz in quizzes:
+                already_attempted = Attempt.objects.filter(
+                    user=request.user,
+                    quiz=quiz,  # ✅ IMPORTANT FIX
+                    taken_at__date=today
+                ).exists()
+
+                if already_attempted:
+                    blocked_quizzes.append(quiz.title)
+                else:
+                    allowed_quizzes.append(quiz)
+
+            # ❌ If all selected quizzes are already attempted
+            if not allowed_quizzes:
+                messages.warning(
+                    request,
+                    "⚠ You have already attempted this subject today. Try again tomorrow or upgrade."
+                )
+                return redirect("dashboard")
+
+            # ⚠ If some are blocked, notify user but continue
+            if blocked_quizzes:
+                messages.warning(
+                    request,
+                    f"⚠ Already attempted today: {', '.join(blocked_quizzes)}"
+                )
+
+            quizzes = allowed_quizzes  # ✅ Only allow unattempted quizzes
+
+        # ===============================
+        # YOUR ORIGINAL CODE (UNCHANGED)
+        # ===============================
         request.session["selected_quizzes"] = [str(q.id) for q in quizzes]
         request.session["current_quiz_index"] = 0
         request.session["answers"] = {}
         request.session["question_indexes"] = {}
-        request.session["counted_questions"] = []  # Track counted questions
+        request.session["counted_questions"] = []
 
         # ✅ GLOBAL TIMER (sum of all subjects)
         total_exam_seconds = sum(q.time_limit for q in quizzes) * 60
         request.session["total_exam_seconds"] = total_exam_seconds
         request.session["start_time"] = timezone.now().isoformat()
 
-        return redirect("take_quiz", quiz_id=quizzes.first().id)
+        return redirect("take_quiz", quiz_id=quizzes[0].id)
 
     return redirect("dashboard")
-
-
 # ===============================
 # SWITCH SUBJECT
 # ===============================

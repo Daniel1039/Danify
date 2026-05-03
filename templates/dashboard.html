@@ -138,46 +138,50 @@
                 >Upgrade for unlimited access</a
               >
             </div>
+            {% endif %} {% if messages %}
+            <div
+              id="modal-popup"
+              style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+              "
+            >
+              <div
+                style="
+                  background: white;
+                  padding: 25px;
+                  border-radius: 12px;
+                  max-width: 350px;
+                  text-align: center;
+                "
+              >
+                <h3 style="margin-bottom: 10px">⚠ Notice</h3>
+                <p>{% for message in messages %} {{ message }} {% endfor %}</p>
+                <button
+                  onclick="document.getElementById('modal-popup').remove()"
+                  style="
+                    margin-top: 15px;
+                    padding: 8px 16px;
+                    border: none;
+                    background: #2563eb;
+                    color: white;
+                    border-radius: 6px;
+                    cursor: pointer;
+                  "
+                >
+                  OK
+                </button>
+              </div>
+            </div>
             {% endif %}
-            {% if messages %}
-<div id="modal-popup" style="
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-">
-    <div style="
-        background: white;
-        padding: 25px;
-        border-radius: 12px;
-        max-width: 350px;
-        text-align: center;
-    ">
-        <h3 style="margin-bottom:10px;">⚠ Notice</h3>
-        <p>
-            {% for message in messages %}
-                {{ message }}
-            {% endfor %}
-        </p>
-        <button onclick="document.getElementById('modal-popup').remove()" 
-            style="
-                margin-top: 15px;
-                padding: 8px 16px;
-                border: none;
-                background: #2563eb;
-                color: white;
-                border-radius: 6px;
-                cursor: pointer;
-            ">
-            OK
-        </button>
-    </div>
-</div>
-{% endif %}
 
             <!-- Stats Row -->
             <div class="stats-row">
@@ -331,36 +335,80 @@
           <div class="page" id="page-exams">
             <div class="card-box">
               <div class="card-header-row">
-                <h3 class="card-title">📝 Select Your Subjects</h3>
-                <button
-                  type="button"
-                  class="btn-outline"
-                  data-bs-toggle="modal"
-                  data-bs-target="#resultModal"
-                >
-                  📊 View Results
-                </button>
+                <h3 class="card-title">📝 Select Your Exams by Subject</h3>
               </div>
 
               <form method="POST" action="{% url 'start_exam' %}">
                 {% csrf_token %}
-                <div class="subject-grid">
-                  {% for quiz in quizzes %}
-                  <div class="subject-item">
-                    <input
-                      type="checkbox"
-                      name="subjects"
-                      value="{{ quiz.id }}"
-                      id="quiz_{{ quiz.id }}"
-                    />
-                    <label class="subject-label" for="quiz_{{ quiz.id }}">
-                      <span class="chk">✓</span>
-                      {{ quiz.title }}
-                    </label>
+
+                <!-- SUBJECT FILTER -->
+                <div style="margin-bottom: 15px">
+                  <select id="subjectFilter" class="form-select">
+                    <option value="">All Subjects</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject.id }}">{{ subject.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <!-- ACCORDION (FIXED - NO DUPLICATES) -->
+                <div class="accordion" id="quizAccordion">
+                  {% for subject, quiz_list in grouped_quizzes.items %}
+
+                  <div
+                    class="accordion-item subject-group"
+                    data-subject="{{ subject.id }}"
+                  >
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#sub{{ subject.id }}"
+                      >
+                        📘 {{ subject.name }}
+                      </button>
+                    </h2>
+
+                    <div
+                      id="sub{{ subject.id }}"
+                      class="accordion-collapse collapse"
+                      data-bs-parent="#quizAccordion"
+                    >
+                      <div class="accordion-body">
+                        {% for quiz in quiz_list %}
+                        <div class="form-check mb-2 quiz-item">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="quizzes"
+                            value="{{ quiz.id }}"
+                            data-subject="{{ subject.id }}"
+                            id="quiz_{{ quiz.id }}"
+                          />
+
+                          <label
+                            class="form-check-label"
+                            for="quiz_{{ quiz.id }}"
+                          >
+                             {{ quiz.title }}
+                          </label>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted">
+                          No quizzes available in this subject.
+                        </p>
+                        {% endfor %}
+                      </div>
+                    </div>
                   </div>
+
                   {% endfor %}
                 </div>
-                <button type="submit" class="btn-primary">🚀 Start Exam</button>
+
+                <button type="submit" class="btn-primary mt-3">
+                  🚀 Start Exam
+                </button>
               </form>
             </div>
           </div>
@@ -1021,7 +1069,27 @@
           document.getElementById("videoFrame").src = "";
         });
     </script>
+    <script>
+      document
+        .getElementById("subjectFilter")
+        .addEventListener("change", function () {
+          let selected = this.value;
+          let items = document.querySelectorAll(".subject-item");
+
+          items.forEach(function (item) {
+            if (
+              selected === "" ||
+              item.getAttribute("data-subject") === selected
+            ) {
+              item.style.display = "block";
+            } else {
+              item.style.display = "none";
+            }
+          });
+        });
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="{% static 'js/dashboard.js' %}"></script>
   </body>
 </html>
+ 

@@ -10,6 +10,15 @@ import calendar
 User = get_user_model()
 
 
+
+# ============================
+# EXAM TYPE (WAEC, JAMB, etc.)
+# ============================
+# class ExamType(models.Model):
+    # name = models.CharField(max_length=50, unique=True)
+# 
+    # def __str__(self):
+        # return self.name
 # ============================
 # SUBJECT
 # ============================
@@ -49,6 +58,8 @@ class ClassArm(models.Model):
 # ============================
 # QUIZ
 # ============================
+# In models.py
+
 class Quiz(models.Model):
     title = models.CharField(max_length=200)
 
@@ -59,28 +70,80 @@ class Quiz(models.Model):
         blank=True
     )
 
-    # Class
+    # This represents WAEC, JAMB, etc.
+    exam_type = models.ForeignKey(
+        SchoolClass,  # Or create a separate ExamType model
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='exam_quizzes'
+    )
+
+    # This is for SS1, SS2, etc. (if you still need it)
     school_class = models.ForeignKey(
         SchoolClass,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name='class_quizzes'
     )
 
-    # Multiple arms
     arms = models.ManyToManyField(ClassArm, blank=True)
-
-    time_limit = models.PositiveIntegerField(
-        help_text='Time limit in minutes',
-        default=10
-    )
-
+    time_limit = models.PositiveIntegerField(default=10)
     total_questions = models.PositiveIntegerField(default=10)
-       
-    
+
+    class Meta:
+        # ✅ NEW CONSTRAINT: Allow same quiz name for different exam types
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'subject', 'exam_type'],
+                name='unique_quiz_per_exam_type'
+            )
+        ]
 
     def __str__(self):
-        return self.title
+        exam = self.exam_type.name if self.exam_type else "General"
+        return f"{self.title} - {self.subject} ({exam})"
+
+
+
+
+# class Quiz(models.Model):
+    # title = models.CharField(max_length=200)
+# 
+    # subject = models.ForeignKey(
+        # Subject,
+        # on_delete=models.SET_NULL,
+        # null=True,
+        # blank=True
+    # )
+# 
+    # school_class = models.ForeignKey(
+        # SchoolClass,
+        # on_delete=models.SET_NULL,
+        # null=True,
+        # blank=True
+    # )
+# 
+    # arms = models.ManyToManyField(ClassArm, blank=True)
+# 
+    # time_limit = models.PositiveIntegerField(
+        # help_text='Time limit in minutes',
+        # default=10
+    # )
+# 
+    # total_questions = models.PositiveIntegerField(default=10)
+# 
+    # class Meta:
+        # constraints = [
+            # models.UniqueConstraint(
+                # fields=['title', 'subject', 'school_class'],
+                # name='unique_quiz_per_subject_class'
+            # )
+        # ]
+# 
+    # def __str__(self):
+        # return f"{self.title} ({self.subject})"
 
 
 # ============================

@@ -4,10 +4,11 @@ from django.shortcuts import render, redirect
 from django.template.response import TemplateResponse
 import csv, io
 from django.contrib import admin
+# from .models import ExamType
 from .models import ContactMessage
 from .models import Subject, Quiz, Question, Attempt, SchoolClass, ClassArm, StudentProfile, StudyMaterial
 
-
+from .views import admin_dashboard
 # ---------------- Subject ----------------
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
@@ -37,7 +38,6 @@ class StudentProfileAdmin(admin.ModelAdmin):
     )
 
 
-    # search_fields = ('user__username',
 from django.contrib import admin
 from .models import Quiz, Question
 
@@ -51,14 +51,15 @@ class QuestionInline(admin.StackedInline):
         'correct_option', 'explanation',
     )
 
+
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'subject', 'school_class',  'time_limit', 'total_questions')
+    list_display = ('title', 'subject', 'exam_type', 'school_class', 'time_limit', 'total_questions')
+    list_filter = ('exam_type', 'subject', 'school_class')
     filter_horizontal = ('arms',)
     inlines = [QuestionInline]
 
     def display_arms(self, obj):
-        # Make sure this matches your ManyToManyField name in Quiz
         return ", ".join([arm.name for arm in obj.arms.all()])
     display_arms.short_description = 'Arms'
 
@@ -74,6 +75,7 @@ class QuizAdmin(admin.ModelAdmin):
     def import_questions(self, request):
         import csv, io
         from django.shortcuts import redirect, render
+        from django.utils.text import slugify
         if request.method == 'POST':
             csvfile = request.FILES['csv_file']
             data = csvfile.read().decode('utf-8')
@@ -81,9 +83,41 @@ class QuizAdmin(admin.ModelAdmin):
             created = 0
             for row in reader:
                 quiz_title = row.get('quiz') or 'Default Quiz'
-                quiz, _ = Quiz.objects.get_or_create(title=quiz_title)
+                subject_name = row.get('subject', '').strip()
+                exam_type_name = row.get('exam_type', '').strip()
+                
+                # Get or create subject
+                subject = None
+                if subject_name:
+                    # ✅ Try to get existing subject first by name
+                    subject = Subject.objects.filter(name__iexact=subject_name).first()
+                    if not subject:
+                        # Create new subject with unique slug
+                        slug = slugify(subject_name)
+                        subject = Subject.objects.create(
+                            name=subject_name,
+                            slug=slug
+                        )
+                
+                # Get or create exam_type
+                exam_type = None
+                if exam_type_name:
+                    exam_type, _ = SchoolClass.objects.get_or_create(name=exam_type_name)
+                
+                # Get or create quiz with exam_type
+                quiz, _ = Quiz.objects.get_or_create(
+                    title=quiz_title,
+                    subject=subject,
+                    exam_type=exam_type,
+                    defaults={
+                        'time_limit': 60,
+                        'total_questions': 50,
+                    }
+                )
+                
                 Question.objects.create(
                     quiz=quiz,
+                    subject=subject,
                     passage=row.get('passage', ''),
                     text=row['question_text'],
                     marks=int(row.get('marks') or 1),
@@ -99,10 +133,12 @@ class QuizAdmin(admin.ModelAdmin):
             return redirect('..')
         context = dict(self.admin_site.each_context(request))
         return render(request, 'admin/cbtapp/import_questions.html', context)
+
 # ---------------- Question Admin ----------------
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'quiz')
+    list_display = ('text', 'quiz', 'subject')
+    list_filter = ('quiz__exam_type', 'subject')
     change_list_template = "admin/questions_changelist.html"
 
     def get_urls(self):
@@ -113,6 +149,7 @@ class QuestionAdmin(admin.ModelAdmin):
         return custom_urls + urls
 
     def import_csv(self, request):
+        from django.utils.text import slugify
         if request.method == "POST":
             csv_file = request.FILES.get("csv_file")
             if not csv_file:
@@ -127,9 +164,39 @@ class QuestionAdmin(admin.ModelAdmin):
             created = 0
             for row in reader:
                 quiz_title = row.get("quiz", "").strip()
-                quiz, _ = Quiz.objects.get_or_create(title=quiz_title)
                 subject_name = row.get("subject", "").strip()
-                subject = Subject.objects.filter(name__iexact=subject_name).first()
+                exam_type_name = row.get("exam_type", "").strip()
+                
+                # Get or create subject
+                subject = None
+                if subject_name:
+                    # ✅ Try to get existing subject first by name
+                    subject = Subject.objects.filter(name__iexact=subject_name).first()
+                    if not subject:
+                        # Create new subject with unique slug
+                        slug = slugify(subject_name)
+                        subject = Subject.objects.create(
+                            name=subject_name,
+                            slug=slug
+                        )
+                
+                # ✅ Get or create exam_type (using SchoolClass)
+                exam_type = None
+                if exam_type_name:
+                    exam_type, _ = SchoolClass.objects.get_or_create(name=exam_type_name)
+                
+                # ✅ Get or create quiz with exam_type
+                quiz, _ = Quiz.objects.get_or_create(
+                    title=quiz_title,
+                    subject=subject,
+                    exam_type=exam_type,
+                    defaults={
+                        'time_limit': 60,
+                        'total_questions': 50,
+                    }
+                )
+                
+                # Create question
                 Question.objects.create(
                     quiz=quiz,
                     subject=subject,
@@ -147,14 +214,6 @@ class QuestionAdmin(admin.ModelAdmin):
         context = dict(self.admin_site.each_context(request))
         return TemplateResponse(request, "admin/csv_form.html", context)
 
-# ---------------- Attempt Admin ----------------
-# @admin.register(Attempt)
-# class AttemptAdmin(admin.ModelAdmin):
-    # list_display = ('user', 'quiz', 'score', 'total_marks', 'taken_at')
-# 
-
-from django.contrib import admin
-from .models import Attempt, Quiz, Question, Subject
 
 @admin.register(Attempt)
 class AttemptAdmin(admin.ModelAdmin):
@@ -219,3 +278,27 @@ class StudyMaterialAdmin(admin.ModelAdmin):
         'topic',
         'subject__name'
     )
+    
+    
+from django.contrib import admin
+from django.urls import path
+from django.utils.html import format_html
+
+class CustomAdminSite(admin.AdminSite):
+    site_header = "CBT Admin"
+    site_title = "CBT Portal"
+    index_title = "Welcome to CBT Dashboard"
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('dashboard/', self.admin_view(admin_dashboard), name='dashboard'),
+        ]
+        return custom_urls + urls
+
+admin_site = CustomAdminSite(name='custom_admin')
+from .models import Quiz, Attempt, Subscription
+
+admin_site.register(Quiz)
+admin_site.register(Attempt)
+admin_site.register(Subscription)

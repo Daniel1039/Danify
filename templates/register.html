@@ -138,7 +138,7 @@
 
       <div class="field-row">
         <div class="field-group">
-          <label>Class</label>
+          <label>Featured Exams</label>
           {{ profile_form.school_class }}
         </div>
         <div class="field-group">
@@ -177,6 +177,60 @@ function togglePassword(inputId, toggleIcon) {
     eyeClosed.style.display = 'none';
   }
 }
+
+// ========================================
+// DYNAMIC CLASS ARM FILTERING
+// ========================================
+document.addEventListener('DOMContentLoaded', function() {
+  const schoolClassSelect = document.getElementById('id_school_class');
+  const classArmSelect = document.getElementById('id_arm');
+  
+  if (!schoolClassSelect || !classArmSelect) return;
+  
+  // Store all original options from Class Arm dropdown
+  const allArmOptions = Array.from(classArmSelect.options).map(option => ({
+    value: option.value,
+    text: option.text,
+    schoolClassId: option.getAttribute('data-school-class')
+  }));
+  
+  // Function to filter Class Arm based on selected School Class
+  function filterClassArms() {
+    const selectedSchoolClass = schoolClassSelect.value;
+    
+    // Clear current options except the first placeholder
+    classArmSelect.innerHTML = '<option value="">---------</option>';
+    
+    // If no school class is selected, show all arms
+    if (!selectedSchoolClass) {
+      allArmOptions.forEach(option => {
+        if (option.value) {
+          const opt = document.createElement('option');
+          opt.value = option.value;
+          opt.text = option.text;
+          classArmSelect.appendChild(opt);
+        }
+      });
+      return;
+    }
+    
+    // Filter and add only matching arms
+    allArmOptions.forEach(option => {
+      if (option.value && option.schoolClassId === selectedSchoolClass) {
+        const opt = document.createElement('option');
+        opt.value = option.value;
+        opt.text = option.text;
+        classArmSelect.appendChild(opt);
+      }
+    });
+  }
+  
+  // Listen for changes on School Class dropdown
+  schoolClassSelect.addEventListener('change', filterClassArms);
+  
+  // Run once on page load to handle pre-selected values
+  filterClassArms();
+});
 </script>
 
 </body>

@@ -30,6 +30,12 @@ from django.conf import settings
 from datetime import timedelta
 
 
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
+from django.contrib.auth.models import User
+from .models import Subscription, Attempt, Quiz
+
+
 def home(request):
     return render(request, 'home.html')
 
@@ -94,67 +100,148 @@ def login_view(request):
 # ===============================
 # DASHBOARD
 # ===============================
+from collections import defaultdict
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Quiz, Subject, StudyMaterial, Attempt, Subscription, StudentProfile
+from django.utils import timezone
+
+
 @login_required
 def dashboard(request):
     profile = StudentProfile.objects.get(user=request.user)
 
-    # ───────── SUBSCRIPTION CHECK ─────────
-    subscription = Subscription.objects.filter(user=request.user).first()
-    has_active_subscription = subscription and subscription.is_active()
-
-    # ✅ CHECK FREE TRIAL STATUS (always show 10 questions max)
-    trial_questions_used = profile.trial_questions_used
-    is_on_free_trial = not has_active_subscription
-
-    # ───────── FETCH DATA ─────────
+    # ======================
+    # QUIZZES (NO DUPLICATES)
+    # ======================
     quizzes = Quiz.objects.filter(
         school_class=profile.school_class,
         arms__in=[profile.arm]
+    ).select_related('subject').distinct()
+
+    # ======================
+    # SUBJECTS (SAFE)
+    # ======================
+    subjects = Subject.objects.filter(
+        quiz__school_class=profile.school_class,
+        quiz__arms__in=[profile.arm]
     ).distinct()
 
+    # ======================
+    # FIX: GROUP QUIZZES MANUALLY (NO REGROUP BUG)
+    # ======================
+    grouped_quizzes = defaultdict(list)
+
+    for quiz in quizzes:
+        if quiz.subject:
+            grouped_quizzes[quiz.subject].append(quiz)
+
+    grouped_quizzes = dict(grouped_quizzes)
+
+    # ======================
+    # MATERIALS
+    # ======================
     materials = StudyMaterial.objects.filter(
         school_class=profile.school_class,
         arms__in=[profile.arm]
     ).distinct()
 
+    # ======================
+    # ATTEMPTS
+    # ======================
     attempts = Attempt.objects.filter(user=request.user).order_by('-taken_at')
 
-    # ───────── DAYS LEFT ─────────
+    # ======================
+    # SUBSCRIPTION
+    # ======================
+    subscription = Subscription.objects.filter(user=request.user).first()
+    has_active_subscription = subscription and subscription.is_active()
+
     days_left = None
     if subscription and subscription.end_date:
         delta = subscription.end_date - timezone.now()
         days_left = max(delta.days, 0)
 
-    # ───────── CONTEXT ─────────
-    context = {
+    return render(request, "dashboard.html", {
         "quizzes": quizzes,
+        "subjects": subjects,
+        "grouped_quizzes": grouped_quizzes,  # ✅ IMPORTANT FIX
+        "materials": materials,
         "attempts": attempts,
         "subscription": subscription,
         "days_left": days_left,
-        "materials": materials,
         "has_active_subscription": has_active_subscription,
-        "is_on_free_trial": is_on_free_trial,
-        "trial_questions_used": trial_questions_used,
-    }
+        "is_on_free_trial": not has_active_subscription,
+    })
 
-    return render(request, "dashboard.html", context)
+
+# @login_required
+# def dashboard(request):
+    # profile = StudentProfile.objects.get(user=request.user)
+# 
+    # ───────── SUBSCRIPTION CHECK ─────────
+    # subscription = Subscription.objects.filter(user=request.user).first()
+    # has_active_subscription = subscription and subscription.is_active()
+# 
+    # ✅ CHECK FREE TRIAL STATUS (always show 10 questions max)
+    # trial_questions_used = profile.trial_questions_used
+    # is_on_free_trial = not has_active_subscription
+# 
+    # ───────── FETCH DATA ─────────
+    # quizzes = Quiz.objects.filter(
+        # school_class=profile.school_class,
+        # arms__in=[profile.arm]
+    # ).distinct()
+# 
+    # materials = StudyMaterial.objects.filter(
+        # school_class=profile.school_class,
+        # arms__in=[profile.arm]
+    # ).distinct()
+# 
+    # attempts = Attempt.objects.filter(user=request.user).order_by('-taken_at')
+# 
+    # ───────── DAYS LEFT ─────────
+    # days_left = None
+    # if subscription and subscription.end_date:
+        # delta = subscription.end_date - timezone.now()
+        # days_left = max(delta.days, 0)
+# 
+    # ───────── CONTEXT ─────────
+    # context = {
+        # "quizzes": quizzes,
+        # "attempts": attempts,
+        # "subscription": subscription,
+        # "days_left": days_left,
+        # "materials": materials,
+        # "has_active_subscription": has_active_subscription,
+        # "is_on_free_trial": is_on_free_trial,
+        # "trial_questions_used": trial_questions_used,
+    # }
+# 
+    # return render(request, "dashboard.html", context)
 @login_required
 def start_exam(request):
     if request.method == "POST":
 
-        selected = request.POST.getlist("subjects")
+        # ✅ FIX: ensure correct POST name from template
+        selected = request.POST.getlist("quizzes") or request.POST.getlist("subjects")
 
         if not selected:
+            messages.warning(request, "Please select at least one quiz.")
             return redirect("dashboard")
 
         quizzes = Quiz.objects.filter(id__in=selected)
 
-        # ✅ CHECK SUBSCRIPTION
+        # ===============================
+        # CHECK SUBSCRIPTION
+        # ===============================
         profile = StudentProfile.objects.get(user=request.user)
         subscription = Subscription.objects.filter(user=request.user).first()
         has_active_subscription = subscription and subscription.is_active()
 
-        # ✅ FREE TRIAL: LIMIT EACH QUIZ TO ONCE PER DAY
+        # ===============================
+        # FREE TRIAL LIMIT CHECK
+        # ===============================
         if not has_active_subscription:
             today = timezone.now().date()
 
@@ -164,7 +251,7 @@ def start_exam(request):
             for quiz in quizzes:
                 already_attempted = Attempt.objects.filter(
                     user=request.user,
-                    quiz=quiz,  # ✅ IMPORTANT FIX
+                    quiz=quiz,
                     taken_at__date=today
                 ).exists()
 
@@ -173,25 +260,32 @@ def start_exam(request):
                 else:
                     allowed_quizzes.append(quiz)
 
-            # ❌ If all selected quizzes are already attempted
             if not allowed_quizzes:
                 messages.warning(
                     request,
-                    "⚠ You have already attempted this subject today. Try again tomorrow or upgrade."
+                    "⚠ You have already attempted these subjects today. Try again tomorrow or upgrade."
                 )
                 return redirect("dashboard")
 
-            # ⚠ If some are blocked, notify user but continue
             if blocked_quizzes:
                 messages.warning(
                     request,
                     f"⚠ Already attempted today: {', '.join(blocked_quizzes)}"
                 )
 
-            quizzes = allowed_quizzes  # ✅ Only allow unattempted quizzes
+            quizzes = allowed_quizzes
 
         # ===============================
-        # YOUR ORIGINAL CODE (UNCHANGED)
+        # SAFETY CHECK (AVOID CRASH)
+        # ===============================
+        quizzes = list(quizzes)
+
+        if len(quizzes) == 0:
+            messages.error(request, "No valid quizzes found.")
+            return redirect("dashboard")
+
+        # ===============================
+        # SESSION SETUP
         # ===============================
         request.session["selected_quizzes"] = [str(q.id) for q in quizzes]
         request.session["current_quiz_index"] = 0
@@ -199,12 +293,19 @@ def start_exam(request):
         request.session["question_indexes"] = {}
         request.session["counted_questions"] = []
 
-        # ✅ GLOBAL TIMER (sum of all subjects)
+        # ===============================
+        # GLOBAL TIMER
+        # ===============================
         total_exam_seconds = sum(q.time_limit for q in quizzes) * 60
         request.session["total_exam_seconds"] = total_exam_seconds
         request.session["start_time"] = timezone.now().isoformat()
 
-        return redirect("take_quiz", quiz_id=quizzes[0].id)
+        # ===============================
+        # START FIRST QUIZ
+        # ===============================
+        first_quiz = quizzes[0]
+
+        return redirect("take_quiz", quiz_id=first_quiz.id)
 
     return redirect("dashboard")
 # ===============================
@@ -499,6 +600,7 @@ def bulk_question_upload(request, quiz_id):
 
     if request.method == "POST":
         form = BulkQuestionUploadForm(request.POST, request.FILES)
+
         if form.is_valid():
             file = form.cleaned_data['file']
 
@@ -512,10 +614,31 @@ def bulk_question_upload(request, quiz_id):
                     return redirect(request.path)
 
                 for index, row in df.iterrows():
-                    Question.objects.create(
-                        quiz=quiz,
+                    # ✅ Get or create quiz based on exam_type
+                    quiz_title = row.get('quiz', quiz.title)
+                    exam_type_name = row.get('exam_type', None)
+                    
+                    # Get exam type (SchoolClass representing WAEC, JAMB, etc.)
+                    exam_type = None
+                    if exam_type_name:
+                        exam_type, _ = SchoolClass.objects.get_or_create(name=exam_type_name)
+                    
+                    # Get or create the quiz for this specific exam type
+                    target_quiz, created = Quiz.objects.get_or_create(
+                        title=quiz_title,
                         subject=quiz.subject,
-                        text=row['text'],
+                        exam_type=exam_type,
+                        defaults={
+                            'time_limit': quiz.time_limit,
+                            'total_questions': quiz.total_questions,
+                        }
+                    )
+
+                    # Create the question
+                    Question.objects.create(
+                        quiz=target_quiz,
+                        subject=quiz.subject,
+                        text=row['question_text'],
                         option_a=row['option_a'],
                         option_b=row['option_b'],
                         option_c=row['option_c'],
@@ -530,10 +653,51 @@ def bulk_question_upload(request, quiz_id):
             except Exception as e:
                 messages.error(request, f"Error processing file: {e}")
                 return redirect(request.path)
+
     else:
         form = BulkQuestionUploadForm()
 
     return render(request, 'bulk_upload.html', {'form': form, 'quiz': quiz})
+# def bulk_question_upload(request, quiz_id):
+    # quiz = Quiz.objects.get(id=quiz_id)
+# 
+    # if request.method == "POST":
+        # form = BulkQuestionUploadForm(request.POST, request.FILES)
+        # if form.is_valid():
+            # file = form.cleaned_data['file']
+# 
+            # try:
+                # if file.name.endswith('.csv'):
+                    # df = pd.read_csv(file)
+                # elif file.name.endswith(('.xls', '.xlsx')):
+                    # df = pd.read_excel(file)
+                # else:
+                    # messages.error(request, "File format not supported.")
+                    # return redirect(request.path)
+# 
+                # for index, row in df.iterrows():
+                    # Question.objects.create(
+                        # quiz=quiz,
+                        # subject=quiz.subject,
+                        # text=row['text'],
+                        # option_a=row['option_a'],
+                        # option_b=row['option_b'],
+                        # option_c=row['option_c'],
+                        # option_d=row['option_d'],
+                        # correct_option=row['correct_option'],
+                        # marks=row.get('marks', 1)
+                    # )
+# 
+                # messages.success(request, "Questions uploaded successfully!")
+                # return redirect('quiz_detail', quiz_id=quiz.id)
+# 
+            # except Exception as e:
+                # messages.error(request, f"Error processing file: {e}")
+                # return redirect(request.path)
+    # else:
+        # form = BulkQuestionUploadForm()
+# 
+    # return render(request, 'bulk_upload.html', {'form': form, 'quiz': quiz})
 
 
 def start_selected_quizzes(request):
@@ -589,3 +753,67 @@ def view_pdf(request, path):
     if os.path.exists(file_path):
         return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
     raise Http404()
+
+
+# 
+# from django.utils import timezone
+# from django.shortcuts import render
+# from django.contrib.auth.models import User
+# from .models import Subscription, Attempt, Quiz
+# 
+def admin_dashboard(request):
+    now = timezone.now()
+
+    total_users = User.objects.count()
+
+    # ✅ Active subscribers (not expired)
+    active_subscribers = Subscription.objects.filter(
+        end_date__gte=now
+    ).count()
+
+    # ✅ Expired subscribers
+    expired_subscribers = Subscription.objects.filter(
+        end_date__lt=now
+    ).count()
+
+    total_quizzes = Quiz.objects.count()
+    total_attempts = Attempt.objects.count()
+
+    context = {
+        "total_users": total_users,
+        "active_subscribers": active_subscribers,
+        "expired_subscribers": expired_subscribers,
+        "total_quizzes": total_quizzes,
+        "total_attempts": total_attempts,
+    }
+
+    return render(request, "admin/dashboard.html", context)
+
+from django.contrib import admin
+from django.urls import path
+from django.shortcuts import render
+from django.utils import timezone
+from django.contrib.auth.models import User
+from .models import Subscription, Attempt, Quiz
+
+def admin_dashboard_view(request):
+    now = timezone.now()
+
+    context = dict(
+        admin.site.each_context(request),  # ✅ IMPORTANT
+        total_users=User.objects.count(),
+        active_subscribers=Subscription.objects.filter(end_date__gte=now).count(),
+        expired_subscribers=Subscription.objects.filter(end_date__lt=now).count(),
+        total_quizzes=Quiz.objects.count(),
+        total_attempts=Attempt.objects.count(),
+    )
+
+    return render(request, "admin/dashboard.html", context)
+
+
+# ✅ Inject dashboard into default admin
+admin.site.get_urls = (lambda original_get_urls:
+    lambda: [
+        path('dashboard/', admin.site.admin_view(admin_dashboard_view)),
+    ] + original_get_urls()
+)(admin.site.get_urls)

@@ -34,12 +34,9 @@ class BulkQuestionUploadForm(forms.Form):
     file = forms.FileField(label="Upload CSV/Excel file")
 
 
-
-
-
 from django import forms
 from django.contrib.auth.models import User
-from .models import StudentProfile
+from .models import StudentProfile, ClassArm
 
 
 class StudentRegisterForm(forms.ModelForm):
@@ -60,7 +57,35 @@ class StudentRegisterForm(forms.ModelForm):
         return cleaned_data
 
 
+# ========================================
+# CUSTOM SELECT WIDGET FOR CLASS ARM
+# ========================================
+class ClassArmSelectWidget(forms.Select):
+    """
+    Custom widget that adds data-school-class attribute to each option
+    """
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        
+        # Add data-school-class attribute to each option
+        if value:
+            try:
+                # Extract the actual ID from the value object
+                actual_value = value.value if hasattr(value, 'value') else value
+                
+                if actual_value:  # Make sure it's not empty string or None
+                    class_arm = ClassArm.objects.get(pk=actual_value)
+                    option['attrs']['data-school-class'] = str(class_arm.school_class.id)
+            except (ClassArm.DoesNotExist, AttributeError, ValueError):
+                pass
+        
+        return option
+
+
 class StudentProfileForm(forms.ModelForm):
     class Meta:
         model = StudentProfile
         fields = ['school_class', 'arm']
+        widgets = {
+            'arm': ClassArmSelectWidget(),  # Use custom widget for filtering
+        }

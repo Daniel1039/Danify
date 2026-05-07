@@ -98,6 +98,12 @@
         <div class="field-group">
           <label>Username</label>
           {{ user_form.username }}
+            {% if user_form.username.errors %}
+    <div class="text-danger mt-1">
+      {{ user_form.username.errors.0 }}
+    </div>
+  {% endif %}
+</div
         </div>
       </div>
 

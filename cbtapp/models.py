@@ -370,3 +370,50 @@ class StudyMaterial(models.Model):
             return f"https://player.vimeo.com/video/{video_id}"
 
         return ""
+    
+# ============================
+# FORMULA FLASHCARDS
+# ============================
+
+class Formula(models.Model):
+
+    SUBJECT_CHOICES = (
+        ('Mathematics', 'Mathematics'),
+        ('Physics', 'Physics'),
+        ('Chemistry', 'Chemistry'),
+    )
+
+    subject = models.CharField(
+        max_length=50,
+        choices=SUBJECT_CHOICES
+    )
+
+    title = models.CharField(max_length=255)
+
+    formula = models.TextField()
+
+    description = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    school_class = models.ForeignKey(
+        SchoolClass,
+        on_delete=models.CASCADE
+    )
+
+    arms = models.ManyToManyField(
+        ClassArm,
+        blank=True
+    )
+
+    image = models.ImageField(
+        upload_to='formula_images/',
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.subject} - {self.title}"

@@ -34,7 +34,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from .models import Subscription, Attempt, Quiz
-
+from .models import Formula
 
 def home(request):
     return render(request, 'home.html')
@@ -126,7 +126,14 @@ def dashboard(request):
         quiz__school_class=profile.school_class,
         quiz__arms__in=[profile.arm]
     ).distinct()
+    # ======================
+# FORMULAS
+# ======================
 
+    formulas = Formula.objects.filter(
+         school_class=profile.school_class,
+         arms__in=[profile.arm]
+    ).distinct()
     # ======================
     # FIX: GROUP QUIZZES MANUALLY (NO REGROUP BUG)
     # ======================
@@ -167,6 +174,7 @@ def dashboard(request):
         "subjects": subjects,
         "grouped_quizzes": grouped_quizzes,  # ✅ IMPORTANT FIX
         "materials": materials,
+        "formulas": formulas,
         "attempts": attempts,
         "subscription": subscription,
         "days_left": days_left,

@@ -298,6 +298,55 @@ class CustomAdminSite(admin.AdminSite):
 
 admin_site = CustomAdminSite(name='custom_admin')
 from .models import Quiz, Attempt, Subscription
+# from .models import Formula
+
+# admin.site.register(Formula)
+import csv
+import io
+from django.contrib import admin, messages
+from .models import Formula, Subject, SchoolClass
+
+
+@admin.register(Formula)
+class FormulaAdmin(admin.ModelAdmin):
+    list_display = ('subject', 'title', 'school_class', 'created_at')
+    search_fields = ('title', 'subject', 'formula')
+
+    change_list_template = "admin/formula_changelist.html"
+
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path("import-csv/", self.import_csv),
+        ]
+        return custom_urls + urls
+
+    def import_csv(self, request):
+        if request.method == "POST":
+            file = request.FILES["csv_file"]
+            decoded = file.read().decode("utf-8")
+            io_string = io.StringIO(decoded)
+            reader = csv.DictReader(io_string)
+
+            count = 0
+
+            for row in reader:
+                subject, _ = Subject.objects.get_or_create(name=row["subject"])
+                school_class = SchoolClass.objects.get(name=row["school_class"])
+
+                Formula.objects.create(
+                    subject=subject.name,
+                    title=row["title"],
+                    formula=row["formula"],
+                    description=row.get("description", ""),
+                    school_class=school_class
+                )
+                count += 1
+
+            self.message_user(request, f"{count} formulas imported successfully!")
+        return None
+
 
 admin_site.register(Quiz)
 admin_site.register(Attempt)

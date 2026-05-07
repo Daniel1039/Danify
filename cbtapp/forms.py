@@ -89,3 +89,8 @@ class StudentProfileForm(forms.ModelForm):
         widgets = {
             'arm': ClassArmSelectWidget(),  # Use custom widget for filtering
         }
+        
+# forms.py
+
+class FormulaUploadForm(forms.Form):
+    file = forms.FileField()

@@ -16,7 +16,218 @@
 
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
   </head>
+  <style>
+
+.formula-tabs{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    margin-bottom:25px;
+    padding-bottom:10px;
+    scrollbar-width:none;
+}
+
+.formula-tabs::-webkit-scrollbar{
+    display:none;
+}
+
+.formula-tab{
+    border:none;
+    background:#f3f4f6;
+    padding:12px 20px;
+    border-radius:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+    white-space:nowrap;
+}
+
+.formula-tab.active{
+    background:linear-gradient(135deg,#2563eb,#4f46e5);
+    color:white;
+}
+
+.formula-slider-container{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.formula-slider-wrapper{
+    width:100%;
+    overflow:hidden;
+}
+
+.formula-slider-track{
+    display:flex;
+    transition:transform 0.4s ease;
+}
+
+.formula-slide{
+    min-width:100%;
+    padding:5px;
+    box-sizing:border-box;
+}
+
+.formula-card{
+    background:white;
+    border-radius:24px;
+    padding:30px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 10px 30px rgba(0,0,0,0.06);
+    min-height:300px;
+}
+
+.formula-subject{
+    display:inline-block;
+    background:#dbeafe;
+    color:#1d4ed8;
+    padding:8px 16px;
+    border-radius:30px;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:18px;
+}
+
+.formula-title{
+    font-size:24px;
+    font-weight:700;
+    margin-bottom:20px;
+    color:#111827;
+}
+
+.formula-main{
+    font-size:32px;
+    font-weight:800;
+    color:#4f46e5;
+    margin-bottom:20px;
+    overflow-x:auto;
+}
+/* FORMULA TABS */
+
+.formula-tabs{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    white-space:nowrap;
+    padding-bottom:8px;
+    margin-bottom:20px;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+}
+
+.formula-tabs::-webkit-scrollbar{
+    display:none;
+}
+
+.formula-tab{
+    flex:0 0 auto;
+    border:none;
+    background:#f3f4f6;
+    color:#374151;
+    padding:12px 18px;
+    border-radius:14px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s ease;
+    white-space:nowrap;
+    min-width:max-content;
+}
+
+.formula-tab.active{
+    background:linear-gradient(135deg,#2563eb,#4f46e5);
+    color:white;
+    box-shadow:0 4px 12px rgba(37,99,235,0.3);
+}
+
+.formula-tab:hover{
+    background:#e5e7eb;
+}
+
+@media (max-width:768px){
+
+    .formula-tabs{
+        gap:8px;
+        padding-bottom:6px;
+    }
+
+    .formula-tab{
+        padding:10px 16px;
+        font-size:13px;
+        border-radius:12px;
+    }
+}
+
+@media (max-width:480px){
+
+    .formula-tabs{
+        gap:6px;
+    }
+
+    .formula-tab{
+        padding:9px 14px;
+        font-size:12px;
+    }
+}
+
+.formula-description{
+    color:#6b7280;
+    line-height:1.7;
+}
+
+.formula-image{
+    width:100%;
+    max-height:250px;
+    object-fit:contain;
+    margin-top:20px;
+    border-radius:16px;
+}
+
+.slide-btn{
+    width:50px;
+    height:50px;
+    border:none;
+    border-radius:50%;
+    background:white;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    font-size:22px;
+    cursor:pointer;
+    transition:0.3s;
+    flex-shrink:0;
+}
+
+.slide-btn:hover{
+    background:#2563eb;
+    color:white;
+}
+
+@media(max-width:768px){
+
+    .formula-card{
+        padding:22px;
+    }
+
+    .formula-title{
+        font-size:20px;
+    }
+
+    .formula-main{
+        font-size:24px;
+    }
+
+    .slide-btn{
+        width:42px;
+        height:42px;
+    }
+}
+
+</style>
   <body>
+    
     <!-- SIDEBAR OVERLAY -->
     <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 
@@ -48,6 +259,10 @@
           <button class="nav-item" onclick="showPage('materials', this)">
             <div class="nav-icon">📚</div>
             Study Materials
+          </button>
+          <button class="nav-item" onclick="showPage('formulas', this)">
+            <div class="nav-icon">⚛️</div>
+            Formulars
           </button>
           <div class="nav-label">Account</div>
 
@@ -391,7 +606,7 @@
                             class="form-check-label"
                             for="quiz_{{ quiz.id }}"
                           >
-                             {{ quiz.title }}
+                            {{ quiz.title }}
                           </label>
                         </div>
                         {% empty %}
@@ -622,10 +837,83 @@
               </div>
             </div>
           </div>
-
           <!-- ══════════════════════════════
-           PAGE: PAYMENT
-      ══════════════════════════════ -->
+           <!-- ══════════════════════════════
+               PAGE: FORMULAS
+           ══════════════════════════════ -->
+          <div class="page" id="page-formulas">
+            <div class="card-box">
+              <div class="card-header-row">
+                <h3 class="card-title">🧠 Formulars</h3>
+              </div>
+
+              <!-- SUBJECT TABS -->
+              <div class="formula-tabs">
+                <button class="formula-tab active" data-subject="all">
+                  All
+                </button>
+
+                <button class="formula-tab" data-subject="Physics">
+                  Physics
+                </button>
+
+                <button class="formula-tab" data-subject="Mathematics">
+                  Mathematics
+                </button>
+
+                <button class="formula-tab" data-subject="Chemistry">
+                  Chemistry
+                </button>
+              </div>
+
+              <!-- FORMULA SLIDER -->
+              <div class="formula-slider-container">
+                <button class="slide-btn" id="prevBtn">❮</button>
+
+                <div class="formula-slider-wrapper">
+                  <div class="formula-slider-track" id="formulaTrack">
+                    {% for formula in formulas %}
+
+                    <div
+                      class="formula-slide"
+                      data-subject="{{ formula.subject }}"
+                    >
+                      <div class="formula-card">
+                        <div class="formula-subject">{{ formula.subject }}</div>
+
+                        <div class="formula-title">{{ formula.title }}</div>
+
+                        <div class="formula-main">{{ formula.formula }}</div>
+
+                        {% if formula.description %}
+                        <div class="formula-description">
+                          {{ formula.description }}
+                        </div>
+                        {% endif %} {% if formula.image %}
+                        <img
+                          src="{{ formula.image.url }}"
+                          class="formula-image"
+                        />
+                        {% endif %}
+                      </div>
+                    </div>
+
+                    {% empty %}
+
+                    <div class="empty-state">
+                      <span class="ei">📭</span>
+                      No formulas available yet.
+                    </div>
+
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <button class="slide-btn" id="nextBtn">❯</button>
+              </div>
+            </div>
+          </div>
+          <!-- ══════════════════════════════ PAGE: PAYMENT ══════════════════════ -->
           <div class="page" id="page-payment">
             <!-- Current Status -->
             <div
@@ -1070,26 +1358,321 @@
         });
     </script>
     <script>
-      document
-        .getElementById("subjectFilter")
-        .addEventListener("change", function () {
-          let selected = this.value;
-          let items = document.querySelectorAll(".subject-item");
+      document.addEventListener("DOMContentLoaded", function () {
+        const track = document.getElementById("formulaTrack");
+        const tabs = document.querySelectorAll(".formula-tab");
 
-          items.forEach(function (item) {
-            if (
-              selected === "" ||
-              item.getAttribute("data-subject") === selected
-            ) {
-              item.style.display = "block";
-            } else {
-              item.style.display = "none";
+        let currentIndex = 0;
+        let currentSubject = "all";
+
+        let slides = [];
+
+        function loadSlides() {
+          slides = Array.from(
+            document.querySelectorAll(".formula-slide"),
+          ).filter((slide) => {
+            if (currentSubject === "all") {
+              slide.style.display = "block";
+              return true;
             }
+
+            if (slide.dataset.subject === currentSubject) {
+              slide.style.display = "block";
+              return true;
+            }
+
+            slide.style.display = "none";
+            return false;
+          });
+
+          currentIndex = 0;
+          updateSlider();
+        }
+
+        function updateSlider() {
+          const visibleSlides = slides.filter(
+            (slide) => slide.style.display !== "none",
+          );
+
+          if (visibleSlides.length === 0) return;
+
+          const slideWidth = visibleSlides[0].offsetWidth;
+
+          track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+        }
+
+        function nextFormula() {
+          if (currentIndex < slides.length - 1) {
+            currentIndex++;
+            updateSlider();
+          }
+        }
+
+        function prevFormula() {
+          if (currentIndex > 0) {
+            currentIndex--;
+            updateSlider();
+          }
+        }
+
+        document
+          .getElementById("nextBtn")
+          .addEventListener("click", nextFormula);
+
+        document
+          .getElementById("prevBtn")
+          .addEventListener("click", prevFormula);
+
+        // SUBJECT FILTER
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", function () {
+            tabs.forEach((t) => t.classList.remove("active"));
+
+            this.classList.add("active");
+
+            currentSubject = this.dataset.subject;
+
+            loadSlides();
           });
         });
+
+        // MOBILE SWIPE
+        let startX = 0;
+
+        track.addEventListener("touchstart", function (e) {
+          startX = e.touches[0].clientX;
+        });
+
+        track.addEventListener("touchend", function (e) {
+          let endX = e.changedTouches[0].clientX;
+
+          if (startX - endX > 50) {
+            nextFormula();
+          }
+
+          if (endX - startX > 50) {
+            prevFormula();
+          }
+        });
+
+        // RESIZE FIX
+        window.addEventListener("resize", updateSlider);
+
+        loadSlides();
+      });
+    </script>
+    <script>
+      // Formula Slider JavaScript
+      (function () {
+        // Get DOM elements
+        const track = document.getElementById("formulaTrack");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const tabs = document.querySelectorAll(".formula-tab");
+        const indicatorsContainer = document.getElementById("indicators");
+
+        // State variables
+        let currentIndex = 0;
+        let visibleSlides = [];
+        let allSlides = Array.from(document.querySelectorAll(".formula-slide"));
+
+        // Touch/drag support variables
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let isDragging = false;
+        let isMouseDragging = false;
+        let mouseStartX = 0;
+
+        /**
+         * Filter slides by subject
+         * @param {string} subject - The subject to filter by ('all' or specific subject)
+         */
+        function filterSlides(subject) {
+          visibleSlides =
+            subject === "all"
+              ? allSlides
+              : allSlides.filter((slide) => slide.dataset.subject === subject);
+
+          // Hide/show slides
+          allSlides.forEach((slide) => {
+            slide.style.display = visibleSlides.includes(slide)
+              ? "block"
+              : "none";
+          });
+
+          currentIndex = 0;
+          updateSlider();
+          updateIndicators();
+        }
+
+        /**
+         * Update slider position and button states
+         */
+        function updateSlider() {
+          if (visibleSlides.length === 0) return;
+
+          const offset = -currentIndex * 100;
+          track.style.transform = `translateX(${offset}%)`;
+
+          // Update button states
+          prevBtn.disabled = currentIndex === 0;
+          nextBtn.disabled = currentIndex >= visibleSlides.length - 1;
+
+          // Update indicators
+          document
+            .querySelectorAll(".indicator")
+            .forEach((indicator, index) => {
+              indicator.classList.toggle("active", index === currentIndex);
+            });
+        }
+
+        /**
+         * Create and update slide indicators
+         */
+        function updateIndicators() {
+          indicatorsContainer.innerHTML = "";
+          visibleSlides.forEach((_, index) => {
+            const indicator = document.createElement("div");
+            indicator.className = `indicator ${index === 0 ? "active" : ""}`;
+            indicator.addEventListener("click", () => {
+              currentIndex = index;
+              updateSlider();
+            });
+            indicatorsContainer.appendChild(indicator);
+          });
+        }
+
+        /**
+         * Navigate to previous slide
+         */
+        function goToPrevious() {
+          if (currentIndex > 0) {
+            currentIndex--;
+            updateSlider();
+          }
+        }
+
+        /**
+         * Navigate to next slide
+         */
+        function goToNext() {
+          if (currentIndex < visibleSlides.length - 1) {
+            currentIndex++;
+            updateSlider();
+          }
+        }
+
+        /**
+         * Handle swipe gesture
+         */
+        function handleSwipe() {
+          const swipeThreshold = 50;
+          const diff = touchStartX - touchEndX;
+
+          if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0 && currentIndex < visibleSlides.length - 1) {
+              // Swipe left - next slide
+              goToNext();
+            } else if (diff < 0 && currentIndex > 0) {
+              // Swipe right - previous slide
+              goToPrevious();
+            }
+          }
+        }
+
+        // Button click events
+        prevBtn.addEventListener("click", goToPrevious);
+        nextBtn.addEventListener("click", goToNext);
+
+        // Tab switching events
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            tabs.forEach((t) => t.classList.remove("active"));
+            tab.classList.add("active");
+            filterSlides(tab.dataset.subject);
+          });
+        });
+
+        // Touch events for mobile swipe
+        const sliderWrapper = document.querySelector(".formula-slider-wrapper");
+
+        if (sliderWrapper) {
+          sliderWrapper.addEventListener(
+            "touchstart",
+            (e) => {
+              touchStartX = e.changedTouches[0].screenX;
+              isDragging = true;
+            },
+            { passive: true },
+          );
+
+          sliderWrapper.addEventListener(
+            "touchmove",
+            (e) => {
+              if (!isDragging) return;
+              touchEndX = e.changedTouches[0].screenX;
+            },
+            { passive: true },
+          );
+
+          sliderWrapper.addEventListener(
+            "touchend",
+            (e) => {
+              if (!isDragging) return;
+              isDragging = false;
+              handleSwipe();
+            },
+            { passive: true },
+          );
+
+          // Mouse drag support for desktop
+          sliderWrapper.addEventListener("mousedown", (e) => {
+            mouseStartX = e.screenX;
+            isMouseDragging = true;
+            sliderWrapper.style.cursor = "grabbing";
+          });
+
+          sliderWrapper.addEventListener("mousemove", (e) => {
+            if (!isMouseDragging) return;
+            touchEndX = e.screenX;
+          });
+
+          sliderWrapper.addEventListener("mouseup", (e) => {
+            if (!isMouseDragging) return;
+            isMouseDragging = false;
+            sliderWrapper.style.cursor = "grab";
+            touchStartX = mouseStartX;
+            touchEndX = e.screenX;
+            handleSwipe();
+          });
+
+          sliderWrapper.addEventListener("mouseleave", () => {
+            if (isMouseDragging) {
+              isMouseDragging = false;
+              sliderWrapper.style.cursor = "grab";
+            }
+          });
+        }
+
+        // Keyboard navigation
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "ArrowLeft") {
+            goToPrevious();
+          } else if (e.key === "ArrowRight") {
+            goToNext();
+          }
+        });
+
+        // Initialize slider on page load
+        if (allSlides.length > 0) {
+          filterSlides("all");
+          if (sliderWrapper) {
+            sliderWrapper.style.cursor = "grab";
+          }
+        }
+      })();
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="{% static 'js/dashboard.js' %}"></script>
   </body>
 </html>
- 

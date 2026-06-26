@@ -1,0 +1,243 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Services — ExamPro CBT</title>
+    <meta
+      name="description"
+      content="Explore ExamPro services: CBT system, student dashboard, result management, AI tracking, practice tests and more."
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/styless.css' %}" />
+  </head>
+  <body>
+    <div class="loader"><div class="loader-ring"></div></div>
+
+    <header class="navbar">
+      <div class="container nav-inner">
+        <a href="index.html" class="logo"
+          ><i class="fa-solid fa-graduation-cap"></i><span>DANIFY</span></a
+        >
+        <nav class="nav-links">
+          <a href="{% url 'index' %}">Home</a>
+          <a href="{% url 'servicing' %}">Service</a>
+          <a href="{% url 'about' %}">About</a>
+          <a href="{% url 'pricing' %}">Pricing</a>
+          <a href="{% url 'contact'%}">Contact</a>
+          <a href="{% url 'login' %}" class="nav-cta">Login</a>
+        </nav>
+        <button class="menu-toggle" aria-label="Menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <section class="page-hero">
+      <div class="container reveal">
+        <h1>Our Services</h1>
+        <p>
+          Everything you need to deliver world-class computer-based testing —
+          from secure exam delivery to deep performance insights.
+        </p>
+        <div class="crumbs">
+          <a href="{% url 'index'%}">Home</a> / <span>Services</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="services-grid">
+          <div class="svc-card reveal">
+            <div class="svc-icon"><i class="fa-solid fa-laptop-code"></i></div>
+            <h3>CBT Examination System</h3>
+            <p>
+              Deliver objective and theory exams online with timers,
+              randomization and offline fallback support.
+            </p>
+            <a href="#" class="svc-link"
+              >Learn More <i class="fa-solid fa-arrow-right"></i
+            ></a>
+          </div>
+          <div class="svc-card reveal">
+            <div class="svc-icon">
+              <i class="fa-solid fa-user-graduate"></i>
+            </div>
+            <h3>Student Dashboard</h3>
+            <p>
+              A personalized space for learners to view upcoming exams, past
+              scores and recommended practice.
+            </p>
+            <a href="#" class="svc-link"
+              >Learn More <i class="fa-solid fa-arrow-right"></i
+            ></a>
+          </div>
+          <div class="svc-card reveal">
+            <div class="svc-icon">
+              <i class="fa-solid fa-file-circle-check"></i>
+            </div>
+            <h3>Result Management</h3>
+            <p>
+              Auto-graded results, downloadable transcripts, class rankings and
+              parent-ready report cards.
+            </p>
+            <a href="#" class="svc-link"
+              >Learn More <i class="fa-solid fa-arrow-right"></i
+            ></a>
+          </div>
+          <div class="svc-card reveal">
+            <div class="svc-icon">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <h3>Question Upload System</h3>
+            <p>
+              Bulk upload via CSV or Word, add images and formulas, and organize
+              by subject, topic and difficulty.
+            </p>
+            <a href="#" class="svc-link"
+              >Learn More <i class="fa-solid fa-arrow-right"></i
+            ></a>
+          </div>
+          <div class="svc-card reveal">
+            <div class="svc-icon"><i class="fa-solid fa-brain"></i></div>
+            <h3>AI Performance Tracking</h3>
+            <p>
+              Smart recommendations identify weak topics and suggest
+              personalized study paths for each student.
+            </p>
+            <a href="#" class="svc-link"
+              >Learn More <i class="fa-solid fa-arrow-right"></i
+            ></a>
+          </div>
+          <div class="svc-card reveal">
+            <div class="svc-icon">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </div>
+            <h3>Online Practice Tests</h3>
+            <p>
+              Thousands of WAEC, JAMB, NECO and Post-UTME past questions for
+              daily practice and revision.
+            </p>
+            <a href="#" class="svc-link"
+              >Learn More <i class="fa-solid fa-arrow-right"></i
+            ></a>
+          </div>
+          <div class="svc-card reveal">
+            <div class="svc-icon"><i class="fa-solid fa-school"></i></div>
+            <h3>School Management Integration</h3>
+            <p>
+              Sync teachers, classes, attendance and exam timetables with your
+              existing school information system.
+            </p>
+            <a href="#" class="svc-link"
+              >Learn More <i class="fa-solid fa-arrow-right"></i
+            ></a>
+          </div>
+          <div class="svc-card reveal">
+            <div class="svc-icon"><i class="fa-solid fa-lock"></i></div>
+            <h3>Secure Login Authentication</h3>
+            <p>
+              Role-based access, multi-factor login and exam-specific tokens
+              keep your platform safe.
+            </p>
+            <a href="#" class="svc-link"
+              >Learn More <i class="fa-solid fa-arrow-right"></i
+            ></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding-top: 0">
+      <div class="container">
+        <div class="cta-banner reveal">
+          <h2>Ready to upgrade your examinations?</h2>
+          <p>
+            Join hundreds of schools running their tests on ExamPro. Setup takes
+            less than an hour.
+          </p>
+          <a href="pricing.html" class="btn btn-ghost"
+            >See Pricing <i class="fa-solid fa-arrow-right"></i
+          ></a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <div class="foot-grid">
+          <div class="foot-col">
+            <a href="index.html" class="logo"
+              ><i class="fa-solid fa-graduation-cap"></i><span>ExamPro</span></a
+            >
+            <p>
+              The premium CBT platform powering modern learning across schools,
+              tutoring centers and exam bodies.
+            </p>
+            <div class="socials">
+              <a href="#"><i class="fa-brands fa-facebook-f"></i></a
+              ><a href="#"><i class="fa-brands fa-x-twitter"></i></a
+              ><a href="#"><i class="fa-brands fa-instagram"></i></a
+              ><a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+            </div>
+          </div>
+          <div class="foot-col">
+            <h4>Product</h4>
+            <ul>
+              <li><a href="services.html">Services</a></li>
+              <li><a href="pricing.html">Pricing</a></li>
+              <li><a href="index.html#features">Features</a></li>
+              <li><a href="#">Demo</a></li>
+            </ul>
+          </div>
+          <div class="foot-col">
+            <h4>Company</h4>
+            <ul>
+              <li><a href="about.html">About</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Contact</a></li>
+            </ul>
+          </div>
+          <div class="foot-col">
+            <h4>Contact</h4>
+            <ul>
+              <li>
+                <a href="#"
+                  ><i class="fa-solid fa-envelope"></i> hello@exampro.io</a
+                >
+              </li>
+              <li>
+                <a href="#"
+                  ><i class="fa-solid fa-phone"></i> +234 800 000 0000</a
+                >
+              </li>
+              <li>
+                <a href="#"
+                  ><i class="fa-solid fa-location-dot"></i> Lagos, Nigeria</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="foot-bottom">
+          © <span id="yr"></span> ExamPro. All rights reserved.
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("yr").textContent = new Date().getFullYear();
+    </script>
+    <script src="{% static 'js/index.js' %}"></script>
+  </body>
+</html>

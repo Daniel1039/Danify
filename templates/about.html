@@ -1,116 +1,356 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DANIFY</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>About — ExamPro CBT</title>
+    <meta
+      name="description"
+      content="Learn about ExamPro — our mission, vision, team and journey building the leading CBT platform for African education."
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/styless.css' %}" />
+  </head>
+  <body>
+    <div class="loader"><div class="loader-ring"></div></div>
 
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/about.css' %}">
+    <header class="navbar">
+      <div class="container nav-inner">
+        <a href="index.html" class="logo"
+          ><i class="fa-solid fa-graduation-cap"></i><span>DANIFY</span></a
+        >
+        <nav class="nav-links">
+          <a href="{% url 'index' %}">Home</a>
+          <a href="{% url 'servicing' %}">Service</a>
+          <a href="{% url 'about' %}">About</a>
+          <a href="{% url 'pricing' %}">Pricing</a>
+          <a href="{% url 'contact'%}">Contact</a>
+          <a href="{% url 'login' %}" class="nav-cta">Login</a>
+        </nav>
+        <button class="menu-toggle" aria-label="Menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </header>
 
-</head>
-<body>
+    <section class="page-hero">
+      <div class="container reveal">
+        <h1>About DANIFY</h1>
+        <p>
+          We're building the most reliable CBT platform for modern African
+          education — purpose-built for examiners, schools and learners.
+        </p>
+        <div class="crumbs">
+          <a href="{% url 'index'%}">Home</a> / <span>About</span>
+        </div>
+      </div>
+    </section>
 
-<!-- MOBILE MENU -->
-<div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-close" id="mobileClose" aria-label="Close menu">&#x2715;</button>
-  <ul>
-    <li><a href="{% url 'home' %}" onclick="closeMenu()">Home</a></li>
-    <li><a href="#features" onclick="closeMenu()">Features</a></li>
-    <li><a href="{% url 'pricing' %}" onclick="closeMenu()">Pricing</a></li>
-    <li><a href="{% url 'about' %}" onclick="closeMenu()">About</a></li>
-    <li><a href="{% url 'contact' %}" onclick="closeMenu()">Contact</a></li>
-  </ul>
-  <div class="mobile-menu-buttons">
-    <a href="{% url 'register'%}" class="btn btn-primary">register</a>
-    <a href="{% url 'login' %}" class="btn btn-secondary">Login</a>
-  </div>
-</div>
+    <section>
+      <div class="container about-intro">
+        <div class="reveal">
+          <h2>Modern examinations, simplified.</h2>
+          <p>
+            ExamPro was founded in 2021 to fix the broken examination workflow
+            in schools and tutoring centers. We saw paper-based exams slowing
+            down learning, delaying results and limiting feedback.
+          </p>
+          <p>
+            Today we power hundreds of institutions across Nigeria with secure,
+            fast and friendly online testing — from JAMB simulations to internal
+            mock exams and continuous assessments.
+          </p>
+        </div>
+        <div class="about-illus reveal">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+      </div>
+    </section>
 
-<nav>
-  <div class="nav-container">
-    <a href="#" class="logo">
-      <div class="logo-icon">DA</div>
-      <span>DANIFY</span>  
-    </a>
+    <section style="padding-top: 0">
+      <div class="container">
+        <div class="mv-grid">
+          <div class="mv-card reveal">
+            <i class="fa-solid fa-bullseye"></i>
+            <h3>Our Mission</h3>
+            <p>
+              To make high-quality assessment infrastructure accessible to every
+              school, teacher and learner across Africa.
+            </p>
+          </div>
+          <div class="mv-card reveal">
+            <i class="fa-solid fa-eye"></i>
+            <h3>Our Vision</h3>
+            <p>
+              A future where every student gets fair, instant, data-driven
+              feedback that helps them learn faster.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <ul class="nav-links">
-      <li><a href="{% url 'home' %}">Home</a></li>
-      <li><a href="{% url 'pricing' %}">Pricing</a></li>
-      <li><a href="{% url 'about' %}">About</a></li>
-      <li><a href="{% url 'contact'%}">Contact</a></li>
-    </ul>
+    <section class="features">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">Why Us</span>
+          <h2>Why schools choose ExamPro</h2>
+          <p>
+            Built with the realities of African connectivity, classrooms and
+            curricula in mind.
+          </p>
+        </div>
+        <div class="why-grid">
+          <div class="why-card reveal">
+            <i class="fa-solid fa-bolt"></i>
+            <h4>Lightning Fast</h4>
+            <p>
+              Optimized for slow networks with offline fallback for exam
+              sessions.
+            </p>
+          </div>
+          <div class="why-card reveal">
+            <i class="fa-solid fa-shield-halved"></i>
+            <h4>Bank-Grade Security</h4>
+            <p>
+              End-to-end encryption and proctoring tools protect every test.
+            </p>
+          </div>
+          <div class="why-card reveal">
+            <i class="fa-solid fa-headset"></i>
+            <h4>24/7 Support</h4>
+            <p>Real humans available around the clock during exam season.</p>
+          </div>
+          <div class="why-card reveal">
+            <i class="fa-solid fa-naira-sign"></i>
+            <h4>Affordable Pricing</h4>
+            <p>
+              Transparent plans that scale from small schools to large
+              institutions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <div class="nav-buttons">
-      <a href="{% url 'register'%}" class="btn btn-primary">register</a>
-      <a href="{%url 'login'%}" class="btn btn-secondary">Login</a>
-    </div>
+    <section>
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">Team</span>
+          <h2>Meet the people behind ExamPro</h2>
+          <p>A small, focused team of educators, engineers and designers.</p>
+        </div>
+        <div class="team-grid">
+          <div class="team-card reveal">
+            <div class="team-photo">EA</div>
+            <div class="team-body">
+              <h4>Emeka Adewale</h4>
+              <small>Founder & CEO</small>
+              <div class="team-socials">
+                <a href="#"><i class="fa-brands fa-linkedin-in"></i></a
+                ><a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="team-card reveal">
+            <div class="team-photo">FO</div>
+            <div class="team-body">
+              <h4>Folake Ogun</h4>
+              <small>Head of Product</small>
+              <div class="team-socials">
+                <a href="#"><i class="fa-brands fa-linkedin-in"></i></a
+                ><a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="team-card reveal">
+            <div class="team-photo">KI</div>
+            <div class="team-body">
+              <h4>Kingsley Ibe</h4>
+              <small>Lead Engineer</small>
+              <div class="team-socials">
+                <a href="#"><i class="fa-brands fa-linkedin-in"></i></a
+                ><a href="#"><i class="fa-brands fa-github"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="team-card reveal">
+            <div class="team-photo">ZB</div>
+            <div class="team-body">
+              <h4>Zainab Bello</h4>
+              <small>Education Lead</small>
+              <div class="team-socials">
+                <a href="#"><i class="fa-brands fa-linkedin-in"></i></a
+                ><a href="#"><i class="fa-brands fa-instagram"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <button class="hamburger" id="hamburger" aria-label="Open menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-  </div>
-</nav>
+    <section class="features">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">Journey</span>
+          <h2>Our milestones</h2>
+          <p>
+            From a single classroom pilot to powering examinations nationwide.
+          </p>
+        </div>
+        <div class="timeline">
+          <div class="tl-item reveal">
+            <small>2021</small>
+            <h4>The beginning</h4>
+            <p>Launched our first CBT pilot with 3 partner schools in Lagos.</p>
+          </div>
+          <div class="tl-item reveal">
+            <small>2022</small>
+            <h4>1,000 students</h4>
+            <p>
+              Crossed our first thousand students and added the question bank
+              module.
+            </p>
+          </div>
+          <div class="tl-item reveal">
+            <small>2023</small>
+            <h4>JAMB simulations</h4>
+            <p>
+              Released full WAEC, JAMB and NECO simulation modes used by
+              thousands of candidates.
+            </p>
+          </div>
+          <div class="tl-item reveal">
+            <small>2024</small>
+            <h4>AI tracking</h4>
+            <p>
+              Introduced AI-powered performance recommendations and study paths.
+            </p>
+          </div>
+          <div class="tl-item reveal">
+            <small>2025</small>
+            <h4>200+ institutions</h4>
+            <p>
+              Now trusted by over 200 schools and tutoring centers across
+              Nigeria.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<section class="page-header">
-  <h1>About DANIFY</h1>
-  <p>We are building the future of AI-powered exam preparation for students who want to win.</p>
-</section>
+    <section class="stats">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-item reveal">
+            <h3 data-counter="4" data-suffix="+">0</h3>
+            <p>Years in market</p>
+          </div>
+          <div class="stat-item reveal">
+            <h3 data-counter="200" data-suffix="+">0</h3>
+            <p>Schools served</p>
+          </div>
+          <div class="stat-item reveal">
+            <h3 data-counter="50000" data-suffix="+">0</h3>
+            <p>Students tested</p>
+          </div>
+          <div class="stat-item reveal">
+            <h3 data-counter="36" data-suffix="">0</h3>
+            <p>States covered</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<section class="mission">
-  <div class="mission-container">
-    <div>
-      <h2>Our Mission</h2>
-      <p>To help students prepare smarter using AI-powered simulations, instant feedback, and personalized learning insights.</p>
-    </div>
-    <div class="mission-visual">🎓</div>
-  </div>
-</section>
+    <section>
+      <div class="container">
+        <div class="cta-banner reveal">
+          <h2>Bring ExamPro to your school</h2>
+          <p>
+            Talk to our team about deploying ExamPro for your institution this
+            term.
+          </p>
+          <a href="pricing.html" class="btn btn-ghost"
+            >View Plans <i class="fa-solid fa-arrow-right"></i
+          ></a>
+        </div>
+      </div>
+    </section>
 
-<section class="stats">
-  <div class="stats-grid">
-    <div class="stat-card">
-      <h2>10K+</h2>
-      <p>Students</p>
-    </div>
-    <div class="stat-card">
-      <h2>95%</h2>
-      <p>Success Rate</p>
-    </div>
-    <div class="stat-card">
-      <h2>500K+</h2>
-      <p>Practice Questions</p>
-    </div>
-    <div class="stat-card">
-      <h2>24/7</h2>
-      <p>AI Support</p>
-    </div>
-  </div>
-</section>
+    <footer>
+      <div class="container">
+        <div class="foot-grid">
+          <div class="foot-col">
+            <a href="index.html" class="logo"
+              ><i class="fa-solid fa-graduation-cap"></i><span>ExamPro</span></a
+            >
+            <p>
+              The premium CBT platform powering modern learning across schools,
+              tutoring centers and exam bodies.
+            </p>
+            <div class="socials">
+              <a href="#"><i class="fa-brands fa-facebook-f"></i></a
+              ><a href="#"><i class="fa-brands fa-x-twitter"></i></a
+              ><a href="#"><i class="fa-brands fa-instagram"></i></a
+              ><a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+            </div>
+          </div>
+          <div class="foot-col">
+            <h4>Product</h4>
+            <ul>
+              <li><a href="services.html">Services</a></li>
+              <li><a href="pricing.html">Pricing</a></li>
+              <li><a href="index.html#features">Features</a></li>
+              <li><a href="#">Demo</a></li>
+            </ul>
+          </div>
+          <div class="foot-col">
+            <h4>Company</h4>
+            <ul>
+              <li><a href="about.html">About</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Contact</a></li>
+            </ul>
+          </div>
+          <div class="foot-col">
+            <h4>Contact</h4>
+            <ul>
+              <li>
+                <a href="#"
+                  ><i class="fa-solid fa-envelope"></i> hello@exampro.io</a
+                >
+              </li>
+              <li>
+                <a href="#"
+                  ><i class="fa-solid fa-phone"></i> +234 800 000 0000</a
+                >
+              </li>
+              <li>
+                <a href="#"
+                  ><i class="fa-solid fa-location-dot"></i> Lagos, Nigeria</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="foot-bottom">
+          © <span id="yr"></span> ExamPro. All rights reserved.
+        </div>
+      </div>
+    </footer>
 
-<footer>
-  <div class="footer-container">
-    <div class="footer-column">
-      <h4>DANIFY</h4>
-      <p style="color:var(--gray);">AI-powered learning platform built for ambitious students.</p>
-    </div>
-    <div class="footer-column">
-      <h4>Company</h4>
-      <a href="{% url 'about' %}">About</a>
-      <a href="{% url 'pricing'%}">Pricing</a>
-      <a href="#">Careers</a>
-    </div>
-    <div class="footer-column">
-      <h4>Support</h4>
-      <a href="#">Help Center</a>
-      <a href="{% url 'contact'%}">Contact</a>
-      <a href="#">Terms</a>
-    </div>
-  </div>
-</footer>
-<script src="{% static 'js/about.js' %}"></script>
-</body>
+    <script>
+      document.getElementById("yr").textContent = new Date().getFullYear();
+    </script>
+    <script src="{% static 'js/index.js' %}"></script>
+  </body>
 </html>

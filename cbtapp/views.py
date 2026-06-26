@@ -36,11 +36,15 @@ from django.contrib.auth.models import User
 from .models import Subscription, Attempt, Quiz
 from .models import Formula
 
-def home(request):
-    return render(request, 'home.html')
+def index(request):
+    return render(request, 'index.html')
 
 def pricing(request):
     return render(request, 'pricing.html')
+
+def servicing(request):
+    return render(request, 'services.html')
+
 
 def about(request):
     return render(request, 'about.html')

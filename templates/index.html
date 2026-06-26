@@ -1,0 +1,419 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ExamPro CBT — Smart CBT Platform for Modern Learning</title>
+    <meta
+      name="description"
+      content="Premium CBT platform for WAEC, JAMB, NECO, Post-UTME and school exams. Online exams, instant results, analytics and more."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/styless.css' %}" />
+  </head>
+  <body>
+    <div class="loader"><div class="loader-ring"></div></div>
+
+    <!-- Navbar -->
+    <header class="navbar">
+      <div class="container nav-inner">
+        <a href="index.html" class="logo"
+          ><i class="fa-solid fa-graduation-cap"></i><span>DANIFY</span></a
+        >
+        <nav class="nav-links">
+          <a href="{% url 'index' %}">Home</a>
+          <a href="{% url 'servicing' %}">Service</a>
+          <a href="{% url 'about' %}">About</a>
+          <a href="{% url 'pricing' %}">Pricing</a>
+          <a href="{% url 'contact'%}">Contact</a>
+          <a href="{% url 'login' %}" class="nav-cta">Login</a>
+        </nav>
+        <button class="menu-toggle" aria-label="Menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="reveal">
+          <span class="hero-badge"
+            ><i class="fa-solid fa-bolt"></i> Trusted by 200+ institutions</span
+          >
+          <h1>Smart CBT Platform for <span>Modern Learning</span></h1>
+          <p class="lead">
+            Run secure online examinations for WAEC, JAMB, NECO, Post-UTME and
+            school assessments. Powerful question bank, real-time analytics and
+            instant results — all in one place.
+          </p>
+          <div class="hero-actions">
+            <a href=""{% url 'register'%}"" class="btn btn-primary"
+              >Register <i class="fa-solid fa-arrow-right"></i
+            ></a>
+            <a href="#features" class="btn btn-ghost"
+              ><i class="fa-solid fa-play"></i> Learn More</a
+            >
+          </div>
+        </div>
+        <div class="hero-visual reveal">
+          <div class="floating-pill pill-1">
+            <i class="fa-solid fa-check"></i> Score: 92%
+          </div>
+          <div class="floating-pill pill-2">
+            <i class="fa-solid fa-user-graduate"></i> 12,400 Students
+          </div>
+          <div class="dashboard-card">
+            <div class="dash-top">
+              <h4>Exam Dashboard</h4>
+              <div class="dots"><span></span><span></span><span></span></div>
+            </div>
+            <div class="dash-stats">
+              <div class="dash-stat">
+                <strong>48</strong><small>Active Exams</small>
+              </div>
+              <div class="dash-stat">
+                <strong>96%</strong><small>Pass Rate</small>
+              </div>
+              <div class="dash-stat">
+                <strong>1.2k</strong><small>Questions</small>
+              </div>
+            </div>
+            <div class="dash-bar">
+              <i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="features">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">Features</span>
+          <h2>Everything you need to run great exams</h2>
+          <p>
+            A complete toolkit built for examiners, schools and learners — from
+            question authoring to real-time analytics.
+          </p>
+        </div>
+        <div class="feat-grid">
+          <div class="feat-card reveal">
+            <div class="feat-icon"><i class="fa-solid fa-laptop-file"></i></div>
+            <h3>Online Exams</h3>
+            <p>
+              Schedule, deliver and proctor exams from any device with a smooth,
+              distraction-free interface.
+            </p>
+          </div>
+          <div class="feat-card reveal">
+            <div class="feat-icon"><i class="fa-solid fa-bolt"></i></div>
+            <h3>Instant Result</h3>
+            <p>
+              Auto-graded objective tests give students results immediately
+              after submission.
+            </p>
+          </div>
+          <div class="feat-card reveal">
+            <div class="feat-icon"><i class="fa-solid fa-database"></i></div>
+            <h3>Question Bank</h3>
+            <p>
+              Thousands of curated WAEC, JAMB, NECO and Post-UTME questions
+              organized by subject and year.
+            </p>
+          </div>
+          <div class="feat-card reveal">
+            <div class="feat-icon"><i class="fa-solid fa-chart-line"></i></div>
+            <h3>Performance Analytics</h3>
+            <p>
+              Track student progress with rich charts, score breakdowns and
+              topic-level insights.
+            </p>
+          </div>
+          <div class="feat-card reveal">
+            <div class="feat-icon"><i class="fa-solid fa-stopwatch"></i></div>
+            <h3>Timer System</h3>
+            <p>
+              Configurable timers per exam, section or question keep assessments
+              fair and consistent.
+            </p>
+          </div>
+          <div class="feat-card reveal">
+            <div class="feat-icon">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3>Secure Authentication</h3>
+            <p>
+              Role-based access, exam tokens and anti-cheating safeguards
+              protect every session.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-item reveal">
+            <h3 data-counter="200" data-suffix="+">0</h3>
+            <p>Partner Schools</p>
+          </div>
+          <div class="stat-item reveal">
+            <h3 data-counter="50000" data-suffix="+">0</h3>
+            <p>Students Tested</p>
+          </div>
+          <div class="stat-item reveal">
+            <h3 data-counter="120000" data-suffix="+">0</h3>
+            <p>Questions Available</p>
+          </div>
+          <div class="stat-item reveal">
+            <h3 data-counter="99" data-suffix="%">0</h3>
+            <p>Uptime Reliability</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section>
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">Testimonials</span>
+          <h2>Loved by educators & learners</h2>
+          <p>
+            See what teachers, school owners and students say about running
+            their exams on ExamPro.
+          </p>
+        </div>
+        <div class="test-grid">
+          <div class="test-card reveal">
+            <div class="test-stars">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i
+              ><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i
+              ><i class="fa-solid fa-star"></i>
+            </div>
+            <blockquote>
+              "ExamPro made our internal mock exams effortless. Setup took under
+              an hour and our students love the clean interface."
+            </blockquote>
+            <div class="test-user">
+              <div class="test-avatar">AO</div>
+              <div>
+                <strong>Adaeze Okoro</strong
+                ><small>Principal, Bright Future Academy</small>
+              </div>
+            </div>
+          </div>
+          <div class="test-card reveal">
+            <div class="test-stars">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i
+              ><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i
+              ><i class="fa-solid fa-star"></i>
+            </div>
+            <blockquote>
+              "The analytics changed how I teach. I now know exactly which
+              topics my class struggles with after every test."
+            </blockquote>
+            <div class="test-user">
+              <div class="test-avatar">TI</div>
+              <div>
+                <strong>Tunde Ibrahim</strong><small>Mathematics Teacher</small>
+              </div>
+            </div>
+          </div>
+          <div class="test-card reveal">
+            <div class="test-stars">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i
+              ><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i
+              ><i class="fa-solid fa-star"></i>
+            </div>
+            <blockquote>
+              "Practicing JAMB on ExamPro felt like the real thing. The timer,
+              the layout, the instant scoring — everything was perfect."
+            </blockquote>
+            <div class="test-user">
+              <div class="test-avatar">CN</div>
+              <div>
+                <strong>Chinaza Nwosu</strong
+                ><small>JAMB Candidate, 2025</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">FAQ</span>
+          <h2>Frequently asked questions</h2>
+          <p>
+            Quick answers to the things people ask most before getting started.
+          </p>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item reveal">
+            <button class="faq-q">
+              Is ExamPro suitable for WAEC, JAMB and NECO practice?<i
+                class="fa-solid fa-chevron-down"
+              ></i>
+            </button>
+            <div class="faq-a">
+              <p>
+                Yes. Our question bank covers WAEC, JAMB, NECO and Post-UTME
+                formats, with timed simulations that closely mirror the real
+                exam experience.
+              </p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button class="faq-q">
+              Can my school use ExamPro for internal tests?<i
+                class="fa-solid fa-chevron-down"
+              ></i>
+            </button>
+            <div class="faq-a">
+              <p>
+                Absolutely. Schools can upload their own questions, create
+                custom exams, manage teachers and students, and export results.
+              </p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button class="faq-q">
+              How secure are the exams on the platform?<i
+                class="fa-solid fa-chevron-down"
+              ></i>
+            </button>
+            <div class="faq-a">
+              <p>
+                We use role-based authentication, single-use exam tokens,
+                randomized question order and session monitoring to prevent
+                cheating.
+              </p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button class="faq-q">
+              Do students need to install anything?<i
+                class="fa-solid fa-chevron-down"
+              ></i>
+            </button>
+            <div class="faq-a">
+              <p>
+                No installation required. ExamPro runs in any modern browser on
+                desktop, tablet or mobile.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="newsletter">
+      <div class="container">
+        <div class="news-card reveal">
+          <h2>Get exam tips & product updates</h2>
+          <p>Join thousands of educators receiving our monthly newsletter.</p>
+          <form class="news-form">
+            <input type="email" required placeholder="Enter your email" />
+            <button type="submit" class="btn btn-primary">Subscribe</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="foot-grid">
+          <div class="foot-col">
+            <a href="index.html" class="logo"
+              ><i class="fa-solid fa-graduation-cap"></i><span>ExamPro</span></a
+            >
+            <p>
+              The premium CBT platform powering modern learning across schools,
+              tutoring centers and exam bodies.
+            </p>
+            <div class="socials">
+              <a href="#" aria-label="Facebook"
+                ><i class="fa-brands fa-facebook-f"></i
+              ></a>
+              <a href="#" aria-label="Twitter"
+                ><i class="fa-brands fa-x-twitter"></i
+              ></a>
+              <a href="#" aria-label="Instagram"
+                ><i class="fa-brands fa-instagram"></i
+              ></a>
+              <a href="#" aria-label="LinkedIn"
+                ><i class="fa-brands fa-linkedin-in"></i
+              ></a>
+            </div>
+          </div>
+          <div class="foot-col">
+            <h4>Product</h4>
+            <ul>
+              <li><a href="services.html">Services</a></li>
+              <li><a href="pricing.html">Pricing</a></li>
+              <li><a href="#features">Features</a></li>
+              <li><a href="#">Demo</a></li>
+            </ul>
+          </div>
+          <div class="foot-col">
+            <h4>Company</h4>
+            <ul>
+              <li><a href="about.html">About</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Contact</a></li>
+            </ul>
+          </div>
+          <div class="foot-col">
+            <h4>Contact</h4>
+            <ul>
+              <li>
+                <a href="#"
+                  ><i class="fa-solid fa-envelope"></i> hello@exampro.io</a
+                >
+              </li>
+              <li>
+                <a href="#"
+                  ><i class="fa-solid fa-phone"></i> +234 800 000 0000</a
+                >
+              </li>
+              <li>
+                <a href="#"
+                  ><i class="fa-solid fa-location-dot"></i> Lagos, Nigeria</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="foot-bottom">
+          © <span id="yr"></span> ExamPro. All rights reserved.
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("yr").textContent = new Date().getFullYear();
+    </script>
+    <script src="{% static 'js/index.js' %}"></script>
+  </body>
+</html>

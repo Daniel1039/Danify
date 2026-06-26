@@ -7,7 +7,7 @@ from .views import admin_dashboard
 
 
 urlpatterns = [
-    path('', views.home, name='home'),
+    path('', views.index, name='index'),
     path('login/', views.login_view, name='login'),
     
     # Password Reset URLs
@@ -42,6 +42,7 @@ urlpatterns = [
     path("submit/", views.submit_exam, name="submit_exam"),
     path('quiz/<int:quiz_id>/bulk-upload/', views.bulk_question_upload, name='bulk_question_upload'),
     path('pricing/', views.pricing, name='pricing'),
+    path('servicing/', views.servicing, name='servicing'),
     path('about/', views.about, name='about'),
     path('subscribe/', views.subscribe, name='subscribe'),
     path('register/', views.student_register, name='register'),

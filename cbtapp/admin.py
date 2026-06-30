@@ -200,6 +200,7 @@ class QuestionAdmin(admin.ModelAdmin):
                 Question.objects.create(
                     quiz=quiz,
                     subject=subject,
+                    passage=row.get("passage", ""),
                     text=row["question_text"],
                     option_a=row["option_a"],
                     option_b=row["option_b"],
@@ -207,6 +208,7 @@ class QuestionAdmin(admin.ModelAdmin):
                     option_d=row["option_d"],
                     correct_option=row["correct_option"].upper(),
                     marks=int(row.get("marks", 1)),
+                    explanation=row.get("explanation", ""),
                 )
                 created += 1
             self.message_user(request, f"{created} questions imported successfully!")
@@ -301,51 +303,131 @@ from .models import Quiz, Attempt, Subscription
 # from .models import Formula
 
 # admin.site.register(Formula)
-import csv
-import io
+# import csv
+# import io
 from django.contrib import admin, messages
 from .models import Formula, Subject, SchoolClass
+from django import forms
+from django.urls import path
+from django.shortcuts import redirect
+from django.template.response import TemplateResponse
+import csv
+import io
+
+from .models import Formula, SchoolClass, ClassArm
+
+
+class FormulaAdminForm(forms.ModelForm):
+    class Meta:
+        model = Formula
+        fields = "__all__"
 
 
 @admin.register(Formula)
 class FormulaAdmin(admin.ModelAdmin):
-    list_display = ('subject', 'title', 'school_class', 'created_at')
-    search_fields = ('title', 'subject', 'formula')
+    form = FormulaAdminForm
+
+    list_display = (
+        "subject",
+        "title",
+        "school_class",
+        "display_arms",
+        "created_at",
+    )
+
+    list_filter = (
+        "subject",
+        "school_class",
+        "arms",
+    )
+
+    search_fields = (
+        "title",
+        "formula",
+        "description",
+    )
+
+    filter_horizontal = ("arms",)
 
     change_list_template = "admin/formula_changelist.html"
 
+    def display_arms(self, obj):
+        return ", ".join(arm.name for arm in obj.arms.all())
+
+    display_arms.short_description = "Arms"
+
     def get_urls(self):
-        from django.urls import path
         urls = super().get_urls()
+
         custom_urls = [
-            path("import-csv/", self.import_csv),
+            path(
+                "import-csv/",
+                self.admin_site.admin_view(self.import_csv),
+                name="formula_import_csv",
+            ),
         ]
+
         return custom_urls + urls
 
     def import_csv(self, request):
-        if request.method == "POST":
-            file = request.FILES["csv_file"]
-            decoded = file.read().decode("utf-8")
-            io_string = io.StringIO(decoded)
-            reader = csv.DictReader(io_string)
 
-            count = 0
+        if request.method == "POST":
+
+            csv_file = request.FILES.get("csv_file")
+
+            if not csv_file:
+                self.message_user(request, "Please choose a CSV file.", level=messages.ERROR)
+                return redirect(".")
+
+            reader = csv.DictReader(
+                io.StringIO(csv_file.read().decode("utf-8"))
+            )
+
+            imported = 0
 
             for row in reader:
-                subject, _ = Subject.objects.get_or_create(name=row["subject"])
-                school_class = SchoolClass.objects.get(name=row["school_class"])
 
-                Formula.objects.create(
-                    subject=subject.name,
-                    title=row["title"],
-                    formula=row["formula"],
-                    description=row.get("description", ""),
-                    school_class=school_class
+                school_class = SchoolClass.objects.get(
+                    name=row["school_class"].strip()
                 )
-                count += 1
 
-            self.message_user(request, f"{count} formulas imported successfully!")
-        return None
+                formula = Formula.objects.create(
+                    subject=row["subject"].strip(),
+                    title=row["title"].strip(),
+                    formula=row["formula"].strip(),
+                    description=row.get("description", "").strip(),
+                    school_class=school_class,
+                )
+
+                arms = row.get("arms", "").strip()
+
+                if arms:
+
+                    for arm_name in arms.split(","):
+
+                        arm = ClassArm.objects.get(
+                            school_class=school_class,
+                            name=arm_name.strip(),
+                        )
+
+                        formula.arms.add(arm)
+
+                imported += 1
+
+            self.message_user(
+                request,
+                f"{imported} formulas imported successfully."
+            )
+
+            return redirect("../")
+
+        context = dict(self.admin_site.each_context(request))
+
+        return TemplateResponse(
+            request,
+            "admin/csv_form.html",
+            context,
+        )
 
 
 admin_site.register(Quiz)

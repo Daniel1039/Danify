@@ -7,7 +7,7 @@ from django.contrib import admin
 # from .models import ExamType
 from .models import ContactMessage
 from .models import Subject, Quiz, Question, Attempt, SchoolClass, ClassArm, StudentProfile, StudyMaterial
-
+from .utils import get_or_create_question
 from .views import admin_dashboard
 # ---------------- Subject ----------------
 @admin.register(Subject)
@@ -54,10 +54,14 @@ class QuestionInline(admin.StackedInline):
 
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'subject', 'exam_type', 'school_class', 'time_limit', 'total_questions')
+    list_display = ('title', 'subject', 'exam_type', 'school_class', 'time_limit', 'total_questions', 'question_count')
     list_filter = ('exam_type', 'subject', 'school_class')
     filter_horizontal = ('arms',)
     inlines = [QuestionInline]
+    
+    def question_count(self, obj):
+        return obj.question_set.count()
+    question_count.short_description = 'Questions Uploaded'   # column header text
 
     def display_arms(self, obj):
         return ", ".join([arm.name for arm in obj.arms.all()])

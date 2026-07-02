@@ -28,7 +28,7 @@ from django.http import FileResponse, Http404
 import os
 from django.conf import settings
 from datetime import timedelta
-
+from .utils import get_or_create_question
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
@@ -357,18 +357,22 @@ def take_quiz(request, quiz_id):
                 # Save attempt id in session
                 request.session[attempt_key] = attempt.id
 
-                # ====== SHUFFLE QUESTIONS ======
-                questions = list(Question.objects.filter(quiz=quiz))
-                random.shuffle(questions)
-                
-                # ✅ LIMIT TO 10 QUESTIONS FOR FREE TRIAL USERS
+                # ====== RANDOMLY PICK QUESTIONS (JAMB-STYLE) ======
+                all_question_ids = list(
+                    Question.objects.filter(quiz=quiz).values_list('id', flat=True)
+                )
+
                 subscription = Subscription.objects.filter(user=request.user).first()
                 has_active_subscription = subscription and subscription.is_active()
-                
-                if not has_active_subscription:
-                    # Free trial: always show max 10 questions
-                    questions = questions[:5]
-                
+
+                # ✅ Subscribed = 40 random questions, Free trial = 5 random questions
+                num_to_pick = 40 if has_active_subscription else 5
+                num_to_pick = min(num_to_pick, len(all_question_ids))
+
+                picked_ids = random.sample(all_question_ids, num_to_pick)
+                questions = list(Question.objects.filter(id__in=picked_ids))
+                random.shuffle(questions)  # randomize the order too
+
                 request.session[f"shuffled_questions_{quiz_id}"] = [q.id for q in questions]
 
             except StudentProfile.DoesNotExist:
@@ -382,7 +386,13 @@ def take_quiz(request, quiz_id):
             else:
                 questions = list(Question.objects.filter(quiz=quiz))
     else:
-        questions = list(Question.objects.filter(quiz=quiz))
+        all_question_ids = list(
+            Question.objects.filter(quiz=quiz).values_list('id', flat=True)
+        )
+        num_to_pick = min(5, len(all_question_ids))
+        picked_ids = random.sample(all_question_ids, num_to_pick)
+        questions = list(Question.objects.filter(id__in=picked_ids))
+        random.shuffle(questions)
 
     if not questions:
         return render(request, "no_questions.html")
@@ -474,7 +484,6 @@ def take_quiz(request, quiz_id):
     }
 
     return render(request, "take_quiz.html", context)
-
 
 @login_required
 def subscribe(request):
@@ -606,7 +615,6 @@ def submit_exam(request):
         "has_active_subscription": has_active_subscription,
         "is_on_free_trial": not has_active_subscription,
     })
-
 def bulk_question_upload(request, quiz_id):
     quiz = Quiz.objects.get(id=quiz_id)
 
@@ -624,6 +632,9 @@ def bulk_question_upload(request, quiz_id):
                 else:
                     messages.error(request, "File format not supported.")
                     return redirect(request.path)
+
+                created_count = 0      # <-- ADD THIS LINE
+                skipped_count = 0      # <-- ADD THIS LINE
 
                 for index, row in df.iterrows():
                     # ✅ Get or create quiz based on exam_type
@@ -646,20 +657,17 @@ def bulk_question_upload(request, quiz_id):
                         }
                     )
 
-                    # Create the question
-                    Question.objects.create(
-                        quiz=target_quiz,
-                        subject=quiz.subject,
-                        text=row['question_text'],
-                        option_a=row['option_a'],
-                        option_b=row['option_b'],
-                        option_c=row['option_c'],
-                        option_d=row['option_d'],
-                        correct_option=row['correct_option'],
-                        marks=row.get('marks', 1)
-                    )
+                    # Create the question (or skip if it already exists)      <-- REPLACE OLD Question.objects.create(...) BLOCK WITH THIS
+                    _, was_created = get_or_create_question(target_quiz, quiz.subject, row)
+                    if was_created:
+                        created_count += 1
+                    else:
+                        skipped_count += 1
 
-                messages.success(request, "Questions uploaded successfully!")
+                messages.success(
+                    request,
+                    f"{created_count} new question(s) added, {skipped_count} duplicate(s) skipped."
+                )                                                              # <-- REPLACES OLD messages.success(request, "Questions uploaded successfully!")
                 return redirect('quiz_detail', quiz_id=quiz.id)
 
             except Exception as e:

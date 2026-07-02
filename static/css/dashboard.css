@@ -1599,3 +1599,94 @@ display:block;
     padding: 10px;
   }
 }
+
+
+.subject-list {
+  margin: 15px 0;
+}
+
+.subject-block {
+  margin-bottom: 18px;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.quiz-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: #fff;
+  min-height: 48px; /* touch-friendly tap target */
+}
+
+.quiz-card:hover {
+  border-color: #4a90d9;
+}
+
+.quiz-checkbox {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #2e7d32;
+}
+
+.quiz-title {
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.quiz-card:has(.quiz-checkbox:checked) {
+  border-color: #2e7d32;
+  background: #e8f5e9;
+}
+
+/* ============================
+   RESPONSIVE BREAKPOINTS
+   ============================ */
+
+/* Tablets */
+@media (max-width: 768px) {
+  .quiz-options {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+  }
+
+  .card-box {
+    padding: 12px;
+  }
+
+  .card-title {
+    font-size: 1.05rem;
+  }
+}
+
+/* Phones */
+@media (max-width: 480px) {
+  .quiz-options {
+    grid-template-columns: 1fr;   /* one column, full width */
+    gap: 8px;
+  }
+
+  .quiz-card {
+    padding: 12px 14px;
+  }
+
+  .quiz-title {
+    font-size: 0.9rem;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+  }
+}
